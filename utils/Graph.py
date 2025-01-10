@@ -41,21 +41,5 @@ class Graph(object):
 
         return iter(self.vertices.values())
 
-if __name__ == "__main__":
-   vertices = [Vertex(x) for x in range(7)]        
-
-   G = Graph()
-   
-   for vertex in vertices:
-       G.add_vertex(vertex)
-       
-   G.add_edge(1, 2)
-   G.add_edge(3, 2)
-   G.add_edge(5, 6)
-   G.add_edge(4, 1)
-   G.add_edge(2, 4)
-
-   print(G.vertices[1].neighbors)
-
    
     

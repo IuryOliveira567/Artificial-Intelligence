@@ -17,7 +17,7 @@ class Edge(object):
 
     def __repr__(self):
 
-         return f"{self.from_node} --> {self.to_node}"
+         return f"{self.from_vertex} --> {self.to_vertex}"
          
 class Graph(object):
 
@@ -55,3 +55,21 @@ class Graph(object):
     def __iter__(self):
 
         return iter(self.vertices.values())
+
+    def dfs(self, start_vertex_id, visited=set()):
+
+        start_vertex = self.vertices.get(start_vertex_id)
+
+        if not start_vertex:
+           return []
+
+        dfs_order = []
+        
+        visited.add(start_vertex_id)
+        dfs_order.append(start_vertex_id)
+
+        for neighbor in start_vertex.edges:
+            if neighbor.to_vertex not in visited:
+               dfs_order.extend(self.dfs(neighbor.to_vertex, visited.copy()))
+
+        return dfs_order

@@ -1,3 +1,5 @@
+from collections import deque
+
 class Vertex(object):
 
     def __init__(self, vertex_id):
@@ -68,8 +70,27 @@ class Graph(object):
         visited.add(start_vertex_id)
         dfs_order.append(start_vertex_id)
 
-        for neighbor in start_vertex.edges:
-            if neighbor.to_vertex not in visited:
-               dfs_order.extend(self.dfs(neighbor.to_vertex, visited.copy()))
+        for edge in start_vertex.edges: #
+            if edge.to_vertex not in visited:
+               dfs_order.extend(self.dfs(edge.to_vertex, visited.copy()))
 
         return dfs_order
+
+    def bfs(self, start_vertex_id):
+
+        queue = deque()
+        visited = set()
+        
+        queue.append(start_vertex_id)
+        visited.add(start_vertex_id)
+            
+        while(queue):
+            
+            current_vertex = queue.popleft()
+            
+            for edge in self.vertices[current_vertex].edges:
+                if(edge.to_vertex not in visited):                   
+                   queue.append(edge.to_vertex)
+                   visited.add(edge.to_vertex)
+
+        return visited

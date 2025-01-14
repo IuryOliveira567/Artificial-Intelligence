@@ -1,4 +1,5 @@
 from collections import deque
+from heapq import heapify, heappop, heappush
 
 class Vertex(object):
 
@@ -44,7 +45,7 @@ class Graph(object):
           if(v1 in self.vertices and v2 in self.vertices):
               self.vertices[v1].edges.append(edge)
 
-              rEdge = Edge(v2, v1)
+              rEdge = Edge(v2, v1, edge.cost)
               self.vertices[v2].edges.append(rEdge)
               return True
           else:
@@ -70,7 +71,7 @@ class Graph(object):
         visited.add(start_vertex_id)
         dfs_order.append(start_vertex_id)
 
-        for edge in start_vertex.edges: #
+        for edge in start_vertex.edges:
             if edge.to_vertex not in visited:
                dfs_order.extend(self.dfs(edge.to_vertex, visited.copy()))
 
@@ -94,3 +95,30 @@ class Graph(object):
                    visited.add(edge.to_vertex)
 
         return visited
+
+    def dijkstra(self, start_vertex, end_vertex):
+
+        distances = {node: float("inf") for node in self.vertices}
+        distances[start_vertex] = 0
+
+        pq = [(0, start_vertex)]
+        heapify(pq)
+
+        visited = set()
+
+        while(pq):
+            current_distance, current_vertex = heappop(pq)
+
+            if(current_vertex in visited):
+                continue
+
+            visited.add(current_vertex)
+
+            for edge in self.vertices[current_vertex].edges:
+                try_distance = current_distance + edge.cost
+
+                if(try_distance < distances[edge.to_vertex]):
+                    distances[edge.to_vertex] = try_distance
+                    heappush(pq, (try_distance, edge.to_vertex))
+                
+        return distances[end_vertex]

@@ -122,3 +122,48 @@ class Graph(object):
                     heappush(pq, (try_distance, edge.to_vertex))
                 
         return distances[end_vertex]
+
+    def heuristic(self, vertex, goal):
+
+        return 1
+
+    def a_star_search(self, start_vertex_id, goal_vertex_id):
+
+        open_set = set([start_vertex_id])
+        came_from = {}
+        g_score = {start_vertex_id: 0}
+        f_score = {start_vertex_id: self.heuristic(start_vertex_id, goal_vertex_id)}
+
+        while open_set:
+            current_id = min(open_set, key=lambda vertex_id: f_score[vertex_id])
+            current = self.vertices[current_id]
+            
+            if(current.id == goal_vertex_id):
+                return self.reconstruct_path(came_from, current_id)
+
+            open_set.remove(current_id)
+
+            for neighbor_edge in current.edges:
+                neighbor = neighbor_edge.to_vertex
+                
+                try_g_score = g_score[current_id] + neighbor_edge.cost
+
+                if(self.vertices[neighbor].id not in g_score or try_g_score < g_score[self.vertices[neighbor].id]):
+                    came_from[self.vertices[neighbor].id] = current.id
+                    g_score[self.vertices[neighbor].id] = try_g_score
+                    f_score[self.vertices[neighbor].id] = g_score[self.vertices[neighbor].id] + self.heuristic(self.vertices[neighbor].id, goal_vertex_id)
+
+                    if(self.vertices[neighbor].id not in open_set):
+                        open_set.add(self.vertices[neighbor].id)
+
+        return None
+
+    def reconstruct_path(self, came_from, current_id):
+
+        total_path = [self.vertices[current_id]]
+
+        while(current_id in came_from):
+            current_id = came_from[current_id]
+            total_path.insert(0, self.vertices[current_id])
+
+        return total_path

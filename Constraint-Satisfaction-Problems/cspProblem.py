@@ -26,8 +26,8 @@ class Constraint(object):
 
         return all(v in assignment for v in self.scope)
 
-    def holds(self, assignment):
-
+    def holds(self, assignment):    
+            
         return self.condition(*tuple(assignment[v] for v in self.scope))
 
 class CSP(object):
@@ -52,7 +52,7 @@ class CSP(object):
         return f"CSP({self.title}, {self.variables}, {([str(c) for c in self.constraints])})"
 
     def consistent(self, assignment):
-
+            
         return all(con.holds(assignment) for con in self.constraints if con.can_evaluate(assignment))
 
     def show(self, linewidth=3, showDomains=False, showAutoAC=False):

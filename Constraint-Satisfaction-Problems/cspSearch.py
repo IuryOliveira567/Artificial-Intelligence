@@ -1,6 +1,9 @@
 import sys
 sys.path.append('../SearchProblem')
+from cspProblem import Constraint, CSP
 from searchProblem import Arc, Search_problem
+from cspDFS import dfs_solver
+
 
 
 class Search_from_CSP(Search_problem):
@@ -22,11 +25,11 @@ class Search_from_CSP(Search_problem):
 
     def start_node(self):
 
-        return {}
+        return self.variables[0]
 
     def neighbors(self, node):
 
-        var = self.variables[len(node.domain)]
+        var = self.variables[len(node)]
         res = []
 
         for val in var.domain:
@@ -37,6 +40,10 @@ class Search_from_CSP(Search_problem):
 
         return res
 
+    def search(self):
+
+        return dfs_solver(self.csp.constraints, {}, self.variables)
+        
 def solver_from_searcher(csp):
 
     path = Searcher(Search_from_CSP(csp)).search() #generic searcher from Search_Problem

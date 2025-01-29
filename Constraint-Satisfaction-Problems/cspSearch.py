@@ -5,7 +5,6 @@ from searchProblem import Arc, Search_problem
 from cspDFS import dfs_solver
 
 
-
 class Search_from_CSP(Search_problem):
 
     def __init__(self, csp, variable_order=None):
@@ -33,9 +32,9 @@ class Search_from_CSP(Search_problem):
         res = []
 
         for val in var.domain:
-            new_env = node | {val: val}
+            new_env = node | {var: val}
 
-            if(self.csp.consistent(new_end)):
+            if(self.csp.consistent(new_env)):
                 res.append(Arc(node, new_env))
 
         return res

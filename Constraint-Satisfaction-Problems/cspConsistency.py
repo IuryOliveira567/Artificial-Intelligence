@@ -69,10 +69,10 @@ class Con_solver(Displayable):
                    return True
             return False
 
-    def generate_sols(self, domain=None, to_do=None, context=dict()):
+    def generate_sols(self, domains=None, to_do=None, context=dict()):
 
         new_domains = self.make_arc_consistent(domains, to_do)
-
+    
         if(any(len(new_domains[var] == 0)) for var in new_domains):
             self.display(1, f"No solutions for context {context}")
         elif all(len(new_domains[var]) == 1 for var in new_domains):
@@ -90,8 +90,8 @@ class Con_solver(Displayable):
 
             self.display(4, "adding", to_do if to_do else "nothing", "to to_do.")
 
-        yield from self.generate_sols(new_doms1, to_do, context | {var: dom1})
-        yield from self.generate_sols(new_doms2, to_do, context | {var: dom1})
+            yield from self.generate_sols(new_doms1, to_do, context | {var: dom1})
+            yield from self.generate_sols(new_doms2, to_do, context | {var: dom1})
 
     def solve_all(self, domains=None, to_do=None):
 
@@ -144,7 +144,7 @@ class Search_with_AC_from_CSP(Search_problem, Displayable):
             self.display(2, "Splitting", var, "into", dom1, "and", dom2)
             to_do = self.cons.new_to_do(var, Node)
 
-            for(dom in [dom1, dom2]):
+            for dom in [dom1, dom2]:
                 newdoms = node | {var: dom}
                 cons_doms = self.cons.make_arc_consistent(newdoms, to_do)
 

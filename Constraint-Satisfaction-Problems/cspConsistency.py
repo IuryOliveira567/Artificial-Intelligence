@@ -25,26 +25,26 @@ class Con_solver(Displayable):
         else:
             to_do = to_do.copy()
 
-        self.display(1, "Performing AC widh domains", self.domains)
+        self.display(5, "Performing AC widh domains", self.domains)
 
         while(to_do):
             self.arc_selected = (var, const) = self.select_arc(to_do)
-            self.display(1, "Processing arc(", var, ",", const, ")")
+            self.display(5, "Processing arc(", var, ",", const, ")")
             other_vars = [ov for ov in const.scope if ov != var]
             new_domain = {val for val in self.domains[var] if self.any_holds(self.domains, const,
                                                                              {var: val}, other_vars)}
 
             if(new_domain != self.domains[var]):
                 self.add_to_do = self.new_to_do(var, const) - to_do
-                self.display(1, f"Arc: ({var}, {const}) is inconsistent\n" f"Domain pruned, dom({var}) = {new_domain} due to {const}")
+                self.display(3, f"Arc: ({var}, {const}) is inconsistent\n" f"Domain pruned, dom({var}) = {new_domain} due to {const}")
                 self.domains[var] = new_domain
-                self.display(1, "adding", self.add_to_do if self.add_to_do else "nothing", "to to_do.")
+                self.display(4, "adding", self.add_to_do if self.add_to_do else "nothing", "to to_do.")
 
                 to_do |= self.add_to_do
 
-            self.display(1, f"Arc: ({var}, {const}) now consistent")
+            self.display(5, f"Arc: ({var}, {const}) now consistent")
 
-        self.display(1, "AC done. Reduced domains", self.domains)
+        self.display(5, "AC done. Reduced domains", self.domains)
         return self.domains
 
     def new_to_do(self, var, const):

@@ -238,7 +238,7 @@ class Runtime_distribution(object):
         plt.ion()
         plt.xlabel("Number of Steps")
         plt.ylabel("Cumulative Number of Runs")
-        plt.xscale(xcale)
+        plt.xscale(xscale)
 
     def plot_runs(self, num_runs=100, max_steps=1000, prob_best=1.0, prob_anycon=1.0):
 

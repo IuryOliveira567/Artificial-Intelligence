@@ -25,7 +25,7 @@ def prove_naf(kb, ans_body, indent=""):
         if(isinstance(selected, Not)):
            kb.display(2, indent, f"proving {selected.atom()}")
 
-           if(prove_naf(kb, [selected_atom()], indent)):
+           if(prove_naf(kb, [selected.atom()], indent)):
               kb.display(2, indent, f"{selected.atom()} succeeded so Not({selected.atom()}) fails")
               return False
            else:

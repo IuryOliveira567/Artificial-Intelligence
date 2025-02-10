@@ -7,11 +7,10 @@ class Strips(object):
         self.effects = effects
         self.cost = cost
 
-
     def __repr__(self):
 
         return self.name
-
+    
     
 class STRIPS_domain(object):
 
@@ -27,3 +26,4 @@ class Planning_problem(object):
         self.prob_domain = prob_domain
         self.initial_state = initial_state
         self.goal = goal
+

@@ -26,7 +26,7 @@ class Constraint(object):
 
         return all(v in assignment for v in self.scope)
 
-    def holds(self, assignment):    
+    def holds(self, assignment):
             
         return self.condition(*tuple(assignment[v] for v in self.scope))
 

@@ -32,8 +32,3 @@ def maxh(*heuristics):
         return max(h(state, goal) for h in heuristic)
 
     return newh
-
-
-
-
-

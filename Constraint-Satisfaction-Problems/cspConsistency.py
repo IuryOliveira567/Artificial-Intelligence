@@ -114,7 +114,7 @@ def partition_domain(dom):
     
     return dom1, dom2
 
-def select(itarable):
+def select(iterable):
 
     for e in iterable:
         return e

@@ -97,7 +97,7 @@ class Data_set(Displayable):
                 if(i == self.target_index):
                     self.target = feat
                 else:
-                    self.input_featres.append(feat)
+                    self.input_features.append(feat)
 
     def infer_type(self, domain):
 
@@ -108,31 +108,294 @@ class Data_set(Displayable):
             return "numeric"
         else:
             return "categorical"
-        
-        
+
+    def conditions(self, max_num_cuts=8, categorical_only=False):
+
+        if((max_num_cuts, categorical_ony) in self.conditions_cache):
+            return self.conditions_cache[(max_num_cuts, categorical_only)]
+
+        conds = []
+
+        for ind, frange in enumerate(self.domains):
+            if(ind != self.target_index and len(frange) > 1):
+                if(len(frange) == 2):
+                    true_val = list(frange)[1]
+
+                    def feat(e, i=ind, tv=true_val):
+                        return e[i] == tv
+
+                    if(self.header):
+                        feat.__doc__ = f"{self.header[ind]} == {true_val}"
+                    else:
+                        feat.__doc__ = f"e[{ind}] == {true_val}"
+
+                    feat.frange = boolean
+                    feat.ftype = "boolean"
+
+                    conds.append(feat)
+            elif(all(isinstance(val, (int, float)) for val in frange)):
+                if(categorical_only):
+                    def feat(e, i=ind):
+                        return e[i]
+
+                    feat.__doct__ = f"e[{ind}]"
+                    conds.append(feat)
+                else:
+                    sorted_frange = sorted(frange)
+                    num_cuts = min(max_num_cuts, len(frange))
+
+                    cut_positions = [len(frange) * i // num_cuts for i in range(1, num_cuts)]
+
+                    for cut in cut_positions:
+                        cutat = sorted_frange[cut]
+                        def feat(e, ind_=ind, cutat=cutat):
+                            return e[ind_] < cutat
+
+                        if(self.header):
+                            feat.__doc__ = self.header[ind] + "<" + str(cutat)
+                        else:
+                            feat.__doc__ = "e[" + str(ind) + "]<" + str(cutat)
+
+                        feat.frange = boolean
+                        feat.ftype = "boolean"
+                        conds.append(feat)
+            else:
+                for val in frange:
+                    def feat(e, ind_=ind, val_=val):
+                        return e[ind_] == val_
+
+                    if(self.header):
+                        feat.__doc__ = self.header[ind] + "==" + str(val)
+                    else:
+                        feat.__doc__ = "e[" + str(ind) + "]==" + str(val)
+
+                    feat.frange = boolean
+                    feat.ftype = "boolean"
+
+                    conds.append(feat)
+
+        self.conditions_cache[(max_num_cuts, categorical_only)] = conds
+        return conds
+
+    def evaluate_dataset(self, data, predictor, error_measure):
+
+        if(data):
+            try:
+                value = statistics.mean(error_measure(predictor(e),
+                                                      self.target(e))
+                                        for e in data)
+            except ValueError:
+                return float("inf")
+        else:
+            return math.nan
 
 
+class Evaluate(object):
 
+    def squared_loss(prediction, actual):
 
+        if(isinstance(prediction, (list, dict))):
+            return (1 - prediction[actual]) ** 2
+        else:
+            return (prediction - actual) ** 2
 
+    def absolute_loss(prediction, actual):
 
+        if(isinstance(prediction, (list, dict))):
+            return abs(1 - prediction[actual])
+        else:
+            return abs(prediction - actual)
 
+    def log_loss(prediction, actual):
 
+        try:
+            if(isinstance(prediction, (list, dict))):
+                return -math.log2(prediction[actual])
+            else:
+                return -math.log2(prediction) if actual == 1 else -math.log2(1 - prediction)
+        except ValueError:
+            return float("inf")
 
+def accuracy(prediction, actual):
 
+    if(isinstance(prediction, dict)):
+        prev_val = prediction[actual]
+        return 1 if all(prev_val >= v for v in prediction.values()) else 0
+    else:
+        return 1 if abs(actual - prediction) <= 0.5 else 0
 
+#all_criteria = [accuracy, absolute_loss, squared_loss, log_loss]    
 
+def partition_data(data, prob_test=0.30):
 
+    train = []
+    test = []
 
+    for example in data:
+        if(random.random() < prob_test):
+            test.append(example)
+        else:
+            train.append(example)
 
+    return train, test
 
+class Data_from_file(Data_set):
 
+    def __init__(self, file_name, separator=',', num_train=None,
+                 prob_test=0.3, has_header=False, target_index=0, one_hot=False,
+                 categorical=[], target_type=None, include_only=None, seed=None):
 
+        with open(file_name, 'r', newline='') as csvfile:
+            self.display(1, "Loading", file_name)
+            data_all = (line.strip().split(separator) for line in csvfile)
 
+            if(include_only is not None):
+                data_all = ([v for (i, v) in enumerate(line) if i in include_only]
+                            for line in data_all)
 
+            if(has_header):
+                header = next(data_all)
+            else:
+                header = None
 
+            data_tuples = (interpret_elements(d) for d in data_all if len(d) > 1)
 
+            if(num_train is not None):
+                train = []
 
+                for i in range(num_train):
+                    train.append(next(data_tuples))
 
+                test = list(data_tuples)
+                Data_set.__init__(self, train, test=test,
+                                  target_index=target_index, header=header)
+            else:
+                Data_set.__init__(self, data_tuples, test=None,
+                                  prob_test=prob_test, target_index=target_index,
+                                  header=header, seed=seed, target_type=target_type,
+                                  one_hot=one_hot)
 
-        
+class Data_from_files(Data_set):
+
+    def __init__(self, train_file_name, test_file_name, separator=',',
+                 has_header=False, target_index=0, one_hot=False,
+                 categorical=[], target_type=None, include_only=None):
+
+        with open(train_file_name, 'r', newline='') as train_file:
+            with open(test_file_name, 'r', newline='') as test_file:
+                train_data = (line.strip().split(separator) for line in train_file)
+                test_data = (line.strip().split(separator) for line in test_file)
+
+                if(include_only is not None):
+                    train_data = ([v for (i, v) in enumerate(line) if i in include_only]
+                                  for line in train_data)
+
+                    test_data = ([v for (i, v) in enumerate(line) if i in include_only]
+                                 for line in test_data)
+
+                if(has_header):
+                    header = next(train_data)
+                else:
+                    header = None
+
+                train_tuples =[interpret_elements(d) for d in train_data if(len(d) > 1)]
+                test_tuples = [interpret_elements(d) for d in test_data if(len(d) > 1)]
+
+                Data_set.__init__(self, train_tuples, test_tuples, target_index=target_index, header=header,
+                                  one_hot=one_hot)
+
+def interpret_elements(str_list):
+
+    res = []
+    
+    for e in str_list:
+        try:
+            res.append(int(e))
+        except ValueError:
+            try:
+                res.append(float(e))
+            except ValueError:
+                se = e.strip()
+
+                if(se in ["True", "true", "TRUE"]):
+                    res.append(True)
+                elif(se in ["False", "false", "FALSE"]):
+                    res.append(False)
+                else:
+                    res.append(e.strip())
+
+    return res
+
+class Data_set_augmented(Data_set):
+
+    def __init__(self, dataset, unary_functions=[], binary_functions=[],
+                 include_orig=True):
+
+        self.orig_dataset = dataset
+        self.unary_functions = unary_functions
+        self.binary_functions = binary_functions
+        self.include_orig = include_orig
+
+        self.target = dataset.target
+        Data_set.__init__(self, dataset.train, test=dataset.test,
+                          target_index=dataset.target_index)
+
+    def create_features(self):
+
+        if(self.include_orig):
+            self.input_features = self.orig_dataset.input_features.copy()
+        else:
+            self.input_features = []
+
+        for u in self.unary_features:
+            for f in self.orig_dataset.input_features:
+                self.input_features.append(u(f))
+
+        for b in self.binary_functions:
+            for f1 in self.orig_dataset.input_features:
+                for f2 in self.orig_dataset.input_features:
+                    if(f1 != f2):
+                        self.input_features.append(b(f1, f2))
+
+def square(f):
+
+    def sq(e):
+        return f(e) ** 2
+
+    sq.__doc__ = f.__doc__ + "**2"
+    return sq
+
+def power_feat(n):
+
+    def fn(f, n=n):
+        def pow(e, n=n):
+            return f(e) ** n
+
+        pow.__doc__ = f.__doc__ + "**" + str(n)
+        return pow
+
+    return fn
+
+def prod_feat(f1, f2):
+
+    def feat(e):
+        return f1(e) * f2(e)
+
+    feat.__doc__ = f1.__doc__ + "*" + f2.__doc__
+    return feat
+
+def eq_feat(f1, f2):
+
+    def feat(e):
+        return 1 if f1(e) == f2(e) else 0
+
+    feat.__doc__ = f1.__doc__ + "==" + f2.__doc__
+    return feat
+
+def neq_feat(f1, f2):
+
+    def feat(e):
+        return 1 if f1(e) != f2(e) else 0
+
+    feat.__doc__ = f1.__doc__ + "!=" + f2.__doc__
+    return feat

@@ -408,3 +408,13 @@ def neq_feat(f1, f2):
     
     feat.__doc__ = f1._doc + "!=" + f2._doc
     return feat
+
+class Learner(Displayable):
+
+    def __init__(self, dataset):
+
+        raise NotImplementedError("Learner.__init__")
+
+    def learn(self):
+
+        raise NotImplementedError("learn")

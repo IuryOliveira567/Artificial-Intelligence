@@ -190,6 +190,13 @@ class Data_set(Displayable):
         else:
             return math.nan
 
+def accuracy(prediction, actual):
+
+    if(isinstance(prediction, dict)):
+        prev_val = prediction[actual]
+        return 1 if all(prev_val >= v for v in prediction.values()) else 0
+    else:
+        return 1 if abs(actual - prediction) <= 0.5 else 0
 
 class Evaluate(object):
 
@@ -217,13 +224,8 @@ class Evaluate(object):
         except ValueError:
             return float("inf")
 
-def accuracy(prediction, actual):
+    all_criteria = [accuracy, absolute_loss, squared_loss, log_loss]
 
-    if(isinstance(prediction, dict)):
-        prev_val = prediction[actual]
-        return 1 if all(prev_val >= v for v in prediction.values()) else 0
-    else:
-        return 1 if abs(actual - prediction) <= 0.5 else 0
 
 def partition_data(data, prob_test=0.30):
 

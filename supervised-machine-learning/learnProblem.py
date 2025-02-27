@@ -186,9 +186,17 @@ class Data_set(Displayable):
                                         for e in data)
             except ValueError:
                 return float("inf")
+            return value
         else:
             return math.nan
 
+def accuracy(prediction, actual):
+
+    if(isinstance(prediction, dict)):
+        prev_val = prediction[actual]
+        return 1 if all(prev_val >= v for v in prediction.values()) else 0
+    else:
+        return 1 if abs(actual - prediction) <= 0.5 else 0
 
 class Evaluate(object):
 
@@ -216,15 +224,8 @@ class Evaluate(object):
         except ValueError:
             return float("inf")
 
-def accuracy(prediction, actual):
+    all_criteria = [accuracy, absolute_loss, squared_loss, log_loss]
 
-    if(isinstance(prediction, dict)):
-        prev_val = prediction[actual]
-        return 1 if all(prev_val >= v for v in prediction.values()) else 0
-    else:
-        return 1 if abs(actual - prediction) <= 0.5 else 0
-
-#all_criteria = [accuracy, absolute_loss, squared_loss, log_loss]    
 
 def partition_data(data, prob_test=0.30):
 
@@ -340,14 +341,14 @@ class Data_set_augmented(Data_set):
         Data_set.__init__(self, dataset.train, test=dataset.test,
                           target_index=dataset.target_index)
 
-    def create_features(self):
+    def create_features(self, one_hot=False):
 
         if(self.include_orig):
             self.input_features = self.orig_dataset.input_features.copy()
         else:
             self.input_features = []
 
-        for u in self.unary_features:
+        for u in self.unary_functions:
             for f in self.orig_dataset.input_features:
                 self.input_features.append(u(f))
 
@@ -381,7 +382,10 @@ def prod_feat(f1, f2):
     def feat(e):
         return f1(e) * f2(e)
 
-    feat.__doc__ = f1.__doc__ + "*" + f2.__doc__
+    f1._doc = f1.__doc__ if f1.__doc__ is not None else "f1"
+    f2._doc = f2.__doc__ if f2.__doc__ is not None else "f2"
+    
+    feat.__doc__ = f1._doc + "*" + f2._doc
     return feat
 
 def eq_feat(f1, f2):
@@ -389,7 +393,11 @@ def eq_feat(f1, f2):
     def feat(e):
         return 1 if f1(e) == f2(e) else 0
 
-    feat.__doc__ = f1.__doc__ + "==" + f2.__doc__
+    f1._doc = f1.__doc__ if f1.__doc__ is not None else "f1"
+    f2._doc = f2.__doc__ if f2.__doc__ is not None else "f2"
+    
+    feat.__doc__ = f1._doc + "==" + f2._doc
+    
     return feat
 
 def neq_feat(f1, f2):
@@ -397,5 +405,18 @@ def neq_feat(f1, f2):
     def feat(e):
         return 1 if f1(e) != f2(e) else 0
 
-    feat.__doc__ = f1.__doc__ + "!=" + f2.__doc__
+    f1._doc = f1.__doc__ if f1.__doc__ is not None else "f1"
+    f2._doc = f2.__doc__ if f2.__doc__ is not None else "f2"
+    
+    feat.__doc__ = f1._doc + "!=" + f2._doc
     return feat
+
+class Learner(Displayable):
+
+    def __init__(self, dataset):
+
+        raise NotImplementedError("Learner.__init__")
+
+    def learn(self):
+
+        raise NotImplementedError("learn")

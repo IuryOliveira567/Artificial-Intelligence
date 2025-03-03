@@ -111,7 +111,7 @@ class Data_set(Displayable):
 
     def conditions(self, max_num_cuts=8, categorical_only=False):
 
-        if((max_num_cuts, categorical_ony) in self.conditions_cache):
+        if((max_num_cuts, categorical_only) in self.conditions_cache):
             return self.conditions_cache[(max_num_cuts, categorical_only)]
 
         conds = []

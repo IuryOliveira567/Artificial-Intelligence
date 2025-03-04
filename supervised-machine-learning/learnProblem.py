@@ -111,7 +111,7 @@ class Data_set(Displayable):
 
     def conditions(self, max_num_cuts=8, categorical_only=False):
 
-        if((max_num_cuts, categorical_ony) in self.conditions_cache):
+        if((max_num_cuts, categorical_only) in self.conditions_cache):
             return self.conditions_cache[(max_num_cuts, categorical_only)]
 
         conds = []
@@ -191,7 +191,7 @@ class Data_set(Displayable):
             return math.nan
 
 def accuracy(prediction, actual):
-
+    "accuracy"
     if(isinstance(prediction, dict)):
         prev_val = prediction[actual]
         return 1 if all(prev_val >= v for v in prediction.values()) else 0
@@ -201,21 +201,21 @@ def accuracy(prediction, actual):
 class Evaluate(object):
 
     def squared_loss(prediction, actual):
-
+        "squared loss"
         if(isinstance(prediction, (list, dict))):
             return (1 - prediction[actual]) ** 2
         else:
             return (prediction - actual) ** 2
 
     def absolute_loss(prediction, actual):
-
+        "absolute loss"
         if(isinstance(prediction, (list, dict))):
             return abs(1 - prediction[actual])
         else:
             return abs(prediction - actual)
 
     def log_loss(prediction, actual):
-
+        "log loss"
         try:
             if(isinstance(prediction, (list, dict))):
                 return -math.log2(prediction[actual])

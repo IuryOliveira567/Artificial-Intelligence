@@ -138,7 +138,7 @@ class Data_set(Displayable):
                     def feat(e, i=ind):
                         return e[i]
 
-                    feat.__doct__ = f"e[{ind}]"
+                    feat.__doc__ = f"e[{ind}]"
                     conds.append(feat)
                 else:
                     sorted_frange = sorted(frange)
@@ -147,14 +147,14 @@ class Data_set(Displayable):
                     cut_positions = [len(frange) * i // num_cuts for i in range(1, num_cuts)]
 
                     for cut in cut_positions:
-                        cutat = sorted_frange[cut]
-                        def feat(e, ind_=ind, cutat=cutat):
-                            return e[ind_] < cutat
+                        cut_at = sorted_frange[cut]
+                        def feat(e, ind_=ind, cutat=cut_at):
+                            return e[ind_] < cut_at
 
                         if(self.header):
-                            feat.__doc__ = self.header[ind] + "<" + str(cutat)
+                            feat.__doc__ = self.header[ind] + "<" + str(cut_at)
                         else:
-                            feat.__doc__ = "e[" + str(ind) + "]<" + str(cutat)
+                            feat.__doc__ = "e[" + str(ind) + "]<" + str(cut_at)
 
                         feat.frange = boolean
                         feat.ftype = "boolean"

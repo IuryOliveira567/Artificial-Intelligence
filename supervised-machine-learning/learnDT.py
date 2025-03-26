@@ -7,7 +7,7 @@ class DT_learner(Learner):
 
     def __init__(self, dataset, split_to_optimize=Evaluate.log_loss,
                  leaf_prediction=Predict().empirical, train=None, max_num_cuts=8,
-                 gamma=1e-7, min_child_weight=10):
+                 gamma=1e-7, min_child_weight=4):
 
         self.dataset = dataset
         self.target = dataset.target
@@ -27,12 +27,12 @@ class DT_learner(Learner):
         return self.learn_tree(self.dataset.conditions(self.max_num_cuts), self.train)
 
     def learn_tree(self, conditions, data_subset):
-        
+
         self.display(2, f"learn_tree with {len(conditions)} features and {len(data_subset)} examples")
         split, partn = self.select_split(conditions, data_subset)
-
+        
         if(split is None):
-            prediction = self.leaf_value(data_subset, self.target.frange)
+            prediction = self.leaf_value(data_subset, self.target.frange)            
             self.display(2, f"leaf prediction for {len(data_subset)} examples is {prediction}")
 
             def leaf_fun(e):
@@ -64,7 +64,7 @@ class DT_learner(Learner):
 
     def leaf_value(self, egs, domain):
         
-        return self.leaf_prediction(data=(self.target(e) for e in egs), domain=domain)
+        return self.leaf_prediction(data=list((self.target(e) for e in egs)), domain=domain)
 
     def select_split(self, conditions, data_subset):
 

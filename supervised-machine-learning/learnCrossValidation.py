@@ -63,7 +63,7 @@ def plot_error(data, criterion=Evaluate().squared_loss, leaf_prediction=Predict.
         maxx = len(data.train) // 2 + 1
 
     verrors = []
-    terros = []
+    terrors = []
 
     for mcw in range(1, maxx):
         verrors.append(folded_data.validation_error(DT_learner, criterion, leaf_prediction=leaf_prediction,
@@ -71,12 +71,10 @@ def plot_error(data, criterion=Evaluate().squared_loss, leaf_prediction=Predict.
         tree = DT_learner(data, criterion, leaf_prediction=leaf_prediction,
                           min_child_weight=mcw).learn()
         
-        terros.append(data.evaluate_dataset(data.test, tree, criterion))
+        terrors.append(data.evaluate_dataset(data.test, tree, criterion))
 
-        plt.plot(range(1, maxx), verrors, ls='-', color='k',
-                 label="validation for " + criterion.__doc__)
-        plt.plot(range(1, maxx), terrors, ls='--', color='k',
-                 label="test set for " + criterion.__doc__)
+        plt.plot(range(1, maxx), verrors, ls='-', color='k', label="validation for " + criterion.__doc__)
+        plt.plot(range(1, maxx), terrors, ls='--', color='k', label="test set for " + criterion.__doc__)
 
-        plt.legend()
+        plt.legend("Errors comparison")
         plt.draw()

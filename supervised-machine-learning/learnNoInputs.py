@@ -1,5 +1,5 @@
 from learnProblem import Evaluate
-import math, random, collections, statistics
+import math, random, statistics
 import utilities
 
 
@@ -83,10 +83,10 @@ def test_no_inputs(error_measures = Evaluate.all_criteria, num_samples=10000,
 
             training = [1 if random.random() < prob else 0 for i in range(train_size)]
             test = [1 if random.random() < prob else 0 for i in range(test_size)]
-
+            
             for predictor in Predict._all:
                 prediction = predictor([], training)
-
+                
                 for error_measure in error_measures:
                     results[predictor][error_measure] += sum(error_measure(prediction, actual) for actual
                                                              in test) / test_size

@@ -11,7 +11,7 @@ boolean = [False, True]
 
 class Data_set(Displayable):
 
-    def __init__(self, train, test=None, prob_test=0.20, target_index=0,
+    def __init__(self, train, test=None, prob_test=0.20, target_index=-1,
                  header=None, target_type=None, one_hot=False,
                  seed=None):
 
@@ -89,7 +89,7 @@ class Data_set(Displayable):
                 if(self.header):
                     feat.__doc__ = self.header[i]
                 else:
-                    feat.__doct__ = "e[" + str(i) + "]"
+                    feat.__doc__ = "e[" + str(i) + "]"
 
                 feat.frange = frange
                 feat.ftype = ftype
@@ -103,7 +103,6 @@ class Data_set(Displayable):
 
         if(all(v in {True, False} for v in domain) or all(v in {0, 1} for v in domain)):
             return "boolean"
-
         if(all(isinstance(v, (float, int)) for v in domain)):
             return "numeric"
         else:
@@ -180,7 +179,7 @@ class Data_set(Displayable):
     def evaluate_dataset(self, data, predictor, error_measure):
 
         if(data):
-            try:
+            try:                    
                 value = statistics.mean(error_measure(predictor(e),
                                                       self.target(e))
                                         for e in data)
@@ -202,11 +201,12 @@ class Evaluate(object):
 
     def squared_loss(prediction, actual):
         "squared loss"
+
         if(isinstance(prediction, (list, dict))):
             return (1 - prediction[actual]) ** 2
         else:
             return (prediction - actual) ** 2
-
+ 
     def absolute_loss(prediction, actual):
         "absolute loss"
         if(isinstance(prediction, (list, dict))):
@@ -215,7 +215,7 @@ class Evaluate(object):
             return abs(prediction - actual)
 
     def log_loss(prediction, actual):
-        "log loss"
+        "log loss"        
         try:
             if(isinstance(prediction, (list, dict))):
                 return -math.log2(prediction[actual])
@@ -243,7 +243,7 @@ def partition_data(data, prob_test=0.30):
 class Data_from_file(Data_set):
 
     def __init__(self, file_name, separator=',', num_train=None,
-                 prob_test=0.3, has_header=False, target_index=0, one_hot=False,
+                 prob_test=0.3, has_header=False, target_index=-1, one_hot=False,
                  categorical=[], target_type=None, include_only=None, seed=None):
 
         with open(file_name, 'r', newline='') as csvfile:

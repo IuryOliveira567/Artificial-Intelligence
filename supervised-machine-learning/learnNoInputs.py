@@ -1,5 +1,5 @@
 from learnProblem import Evaluate
-import math, random, collections, statistics
+import math, random, statistics
 import utilities
 
 
@@ -70,10 +70,10 @@ class Predict(object):
     select = {"boolean": [empirical, bounded_empirical, laplace, cmode, cmedian],
               "categorical": [empirical, bounded_empirical, laplace, cmode, cmedian],
               "numeric": [mean, rmean, mode, median]}
-    
+
 def test_no_inputs(error_measures = Evaluate.all_criteria, num_samples=10000,
                    test_size=10, training_sizes=[1, 2, 3, 4, 5, 10, 20, 100, 1000]):
-
+    
     for train_size in training_sizes:
         results = {predictor: {error_measure: 0 for error_measure in error_measures}
                    for predictor in Predict._all}
@@ -83,11 +83,10 @@ def test_no_inputs(error_measures = Evaluate.all_criteria, num_samples=10000,
 
             training = [1 if random.random() < prob else 0 for i in range(train_size)]
             test = [1 if random.random() < prob else 0 for i in range(test_size)]
-
-            predict = Predict()
-            for predictor in predict._all:
-                prediction = predictor(predict, training)
-
+            
+            for predictor in Predict._all:
+                prediction = predictor([], training)
+                
                 for error_measure in error_measures:
                     results[predictor][error_measure] += sum(error_measure(prediction, actual) for actual
                                                              in test) / test_size
@@ -101,3 +100,5 @@ def test_no_inputs(error_measures = Evaluate.all_criteria, num_samples=10000,
               print(f" {predictor.__doc__}",
                     "\t".join("{:.7f}".format(results[predictor][error_measure] / num_samples)
                               for error_measure in error_measures))
+
+        print("\n" * 2)

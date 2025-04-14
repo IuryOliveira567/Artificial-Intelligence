@@ -24,8 +24,8 @@ class Data_set(Displayable):
         self.train = train
         self.test = test
 
-        self.display(1, "Training set has", len(train), "example. Number of columns: ", {len(e) for e in train})
-        self.display(1, "Test set has", len(test), "examples. Number of columns: ", {len(e) for e in test})
+        self.display(1, f"Training set has", len(train), "example. Number of columns: ", {len(e) for e in train})
+        self.display(1, f"Test set has", len(test), "examples. Number of columns: ", {len(e) for e in test})
 
         self.prob_test = prob_test
         self.num_properties = len(self.train[0])
@@ -176,30 +176,25 @@ class Data_set(Displayable):
         self.conditions_cache[(max_num_cuts, categorical_only)] = conds
         return conds
 
-    def evaluate_dataset(self, data, predictor, error_measure):
+    def evaluate_dataset(self, data, predictor, error_measure, label=-1):
 
         if(data):
-            try:                    
-                value = statistics.mean(error_measure(predictor(e),
-                                                      self.target(e))
-                                        for e in data)
+            try:
+                value = statistics.mean(
+                    error_measure(
+                        predictor(e[:label]),
+                        self.target(e)
+                    )
+                    for e in data)
             except ValueError:
                 return float("inf")
             return value
         else:
             return math.nan
 
-def accuracy(prediction, actual):
-    "accuracy"
-    if(isinstance(prediction, dict)):
-        prev_val = prediction[actual]
-        return 1 if all(prev_val >= v for v in prediction.values()) else 0
-    else:
-        return 1 if abs(actual - prediction) <= 0.5 else 0
-
 class Evaluate(object):
 
-    def squared_loss(prediction, actual):
+    def squared_loss(self, prediction, actual):
         "squared loss"
 
         if(isinstance(prediction, (list, dict))):
@@ -207,14 +202,14 @@ class Evaluate(object):
         else:
             return (prediction - actual) ** 2
  
-    def absolute_loss(prediction, actual):
+    def absolute_loss(self, prediction, actual):
         "absolute loss"
         if(isinstance(prediction, (list, dict))):
             return abs(1 - prediction[actual])
         else:
             return abs(prediction - actual)
 
-    def log_loss(prediction, actual):
+    def log_loss(self, prediction, actual):
         "log loss"        
         try:
             if(isinstance(prediction, (list, dict))):
@@ -224,6 +219,14 @@ class Evaluate(object):
         except ValueError:
             return float("inf")
 
+    def accuracy(self, prediction, actual):
+        "accuracy"
+        if(isinstance(prediction, dict)):
+          prev_val = prediction[actual]
+          return 1 if all(prev_val >= v for v in prediction.values()) else 0
+        else:
+          return 1 if abs(actual - prediction) <= 0.5 else 0
+    
     all_criteria = [accuracy, absolute_loss, squared_loss, log_loss]
 
 

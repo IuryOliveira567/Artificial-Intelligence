@@ -41,7 +41,7 @@ class Data_set(Displayable):
         for example in self.train:
             for ind, val in enumerate(example):
                 self.domains[ind].add(val)
-
+        
         self.conditions_cache = {}
         self.create_features(one_hot)
 
@@ -81,6 +81,7 @@ class Data_set(Displayable):
 
                     feat.frange = boolean
                     feat.type = "boolean"
+
                     self.input_features.append(feat)
             else:
                 def feat(e, index=i):
@@ -98,7 +99,7 @@ class Data_set(Displayable):
                     self.target = feat
                 else:
                     self.input_features.append(feat)
-
+                
     def infer_type(self, domain):
 
         if(all(v in {True, False} for v in domain) or all(v in {0, 1} for v in domain)):
@@ -115,7 +116,7 @@ class Data_set(Displayable):
 
         conds = []
 
-        for ind, frange in enumerate(self.domains):
+        for ind, frange in enumerate(self.domains):            
             if(ind != self.target_index and len(frange) > 1):
                 if(len(frange) == 2):
                     true_val = list(frange)[1]
@@ -132,46 +133,46 @@ class Data_set(Displayable):
                     feat.ftype = "boolean"
 
                     conds.append(feat)
-            elif(all(isinstance(val, (int, float)) for val in frange)):
-                if(categorical_only):
-                    def feat(e, i=ind):
-                        return e[i]
+                elif(all(isinstance(val, (int, float)) for val in frange)):
+                    if(categorical_only):
+                        def feat(e, i=ind):
+                            return e[i]
 
-                    feat.__doc__ = f"e[{ind}]"
-                    conds.append(feat)
+                        feat.__doc__ = f"e[{ind}]"
+                        conds.append(feat)
+                    else:
+                        sorted_frange = sorted(frange)
+                        num_cuts = min(max_num_cuts, len(frange))
+
+                        cut_positions = [len(frange) * i // num_cuts for i in range(1, num_cuts)]
+
+                        for cut in cut_positions:
+                            cut_at = sorted_frange[cut]
+                            def feat(e, ind_=ind, cutat=cut_at):
+                                return e[ind_] < cut_at
+
+                            if(self.header):
+                                feat.__doc__ = self.header[ind] + "<" + str(cut_at)
+                            else:
+                                feat.__doc__ = "e[" + str(ind) + "]<" + str(cut_at)
+
+                            feat.frange = boolean
+                            feat.ftype = "boolean"
+                            conds.append(feat)
                 else:
-                    sorted_frange = sorted(frange)
-                    num_cuts = min(max_num_cuts, len(frange))
-
-                    cut_positions = [len(frange) * i // num_cuts for i in range(1, num_cuts)]
-
-                    for cut in cut_positions:
-                        cut_at = sorted_frange[cut]
-                        def feat(e, ind_=ind, cutat=cut_at):
-                            return e[ind_] < cut_at
+                    for val in frange:
+                        def feat(e, ind_=ind, val_=val):
+                            return e[ind_] == val_
 
                         if(self.header):
-                            feat.__doc__ = self.header[ind] + "<" + str(cut_at)
+                            feat.__doc__ = self.header[ind] + "==" + str(val)
                         else:
-                            feat.__doc__ = "e[" + str(ind) + "]<" + str(cut_at)
+                            feat.__doc__ = "e[" + str(ind) + "]==" + str(val)
 
                         feat.frange = boolean
                         feat.ftype = "boolean"
+
                         conds.append(feat)
-            else:
-                for val in frange:
-                    def feat(e, ind_=ind, val_=val):
-                        return e[ind_] == val_
-
-                    if(self.header):
-                        feat.__doc__ = self.header[ind] + "==" + str(val)
-                    else:
-                        feat.__doc__ = "e[" + str(ind) + "]==" + str(val)
-
-                    feat.frange = boolean
-                    feat.ftype = "boolean"
-
-                    conds.append(feat)
 
         self.conditions_cache[(max_num_cuts, categorical_only)] = conds
         return conds

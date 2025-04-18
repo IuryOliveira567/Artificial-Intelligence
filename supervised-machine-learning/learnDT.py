@@ -5,7 +5,7 @@ import math
 
 class DT_learner(Learner):
 
-    def __init__(self, dataset, split_to_optimize=Evaluate.log_loss,
+    def __init__(self, dataset, split_to_optimize=Evaluate().log_loss,
                  leaf_prediction=Predict().empirical, train=None, max_num_cuts=8,
                  gamma=1e-7, min_child_weight=4):
 
@@ -21,9 +21,9 @@ class DT_learner(Learner):
             self.train = self.dataset.train
         else:
             self.train = train
-    
-    def learn(self, max_num_cuts=8):
 
+    def learn(self, max_num_cuts=8):
+            
         return self.learn_tree(self.dataset.conditions(self.max_num_cuts), self.train)
 
     def learn_tree(self, conditions, data_subset):
@@ -67,7 +67,7 @@ class DT_learner(Learner):
         return self.leaf_prediction(data=list((self.target(e) for e in egs)), domain=domain)
 
     def select_split(self, conditions, data_subset):
-
+        
         best_feat = None
         best_error = self.sum_losses(data_subset) - self.gamma
 

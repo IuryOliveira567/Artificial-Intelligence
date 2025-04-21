@@ -49,7 +49,7 @@ class K_fold_dataset(object):
 
         return error / len(self.data)
 
-def plot_error(data, criterion=Evaluate().squared_loss, leaf_prediction=Predict.empirical,
+def plot_error(data, criterion=Evaluate().squared_loss, leaf_prediction=Predict().empirical,
                num_folds=4, maxx=None, xscale='linear'):
 
     plt.ion()
@@ -73,8 +73,8 @@ def plot_error(data, criterion=Evaluate().squared_loss, leaf_prediction=Predict.
         
         terrors.append(data.evaluate_dataset(data.test, tree, criterion))
 
-        plt.plot(range(1, maxx), verrors, ls='-', color='k', label="validation for " + criterion.__doc__)
-        plt.plot(range(1, maxx), terrors, ls='--', color='k', label="test set for " + criterion.__doc__)
+    plt.plot(range(1, maxx), verrors, ls='-', color='k', label="validation for " + criterion.__doc__)
+    plt.plot(range(1, maxx), terrors, ls='--', color='k', label="test set for " + criterion.__doc__)
 
-        plt.legend("Errors comparison")
-        plt.draw()
+    plt.legend("Errors comparison")
+    plt.draw()

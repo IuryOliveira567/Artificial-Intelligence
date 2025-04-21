@@ -67,7 +67,7 @@ class Boosting_learner(Learner):
             self.display(1, f"Iteration {len(self.offsets) - 1}, treesize={new_offset.num_leaves}. mean\
                                   squared loss={self.errors[-1]}")
 
-            return self.predictor
+        return self.predictor
 
 def sp_DT_learner(split_to_optimize=Evaluate.squared_loss, leaf_prediction=Predict.mean, **nargs):
 

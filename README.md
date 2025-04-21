@@ -13,6 +13,7 @@ different techniques using python as well as the documentation of my learning pr
   <li>Python</li>
   <li>Numpy</li>
   <li>Matplotlib</li>
+  <li>Scikit-learn</li>
   <li>TensorFlow</li>
   <li>Linear Algebra</li>
   <li>Statistics and Probability</li>

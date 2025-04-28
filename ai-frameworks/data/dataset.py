@@ -101,7 +101,7 @@ class Data_Set():
         """Plot the value counts of a target variable as a bar chart."""
 
         self.data[feature].value_counts().plot(kind='bar')
-        plt.title(f"Value Counts of {target}")
+        plt.title(f"Value Counts of {feature}")
         self.plot(filename)
 
     def plot_violin(self, x_feature, y_feature, filename=None):

@@ -49,6 +49,7 @@ class Data_Set():
         """Plot histograms for all numeric features."""
 
         self.data.hist(bins=bins, figsize=fig_size)
+        plt.title("Feature Distributions")
         self.plot(filename)
 
     def plot_correlation_heatmap(self, filename=None):
@@ -67,37 +68,40 @@ class Data_Set():
         """Plot a boxplot of a feature grouped by the target variable."""
 
         sns.boxplot(x=x_feature, y=y_feature, data=self.data)
+        plt.title(f"Boxplot of {x_feature} by {y_feature}")
         self.plot(filename)
         
     def plot_pairplot(self, feature, filename=None):
         """Plot pairwise relationships between features, colored by the target."""
 
         sns.pairplot(self.data, hue=feature)
+        plt.title(f"Pairplot of Features Colored by {feature}")
         self.plot(filename)
 
     def plot_bar(self, feature, filename=None):
         """Plot a bar chart showing the distribution of a categorical variable."""
 
         sns.countplot(x=feature, data=self.data)
+        plt.title(f"Distribution of {feature}")
         self.plot(filename)
 
     def plot_scatter(self, x_feature, y_feature, hue=None, filename=None):
         """Plot a scatterplot between two features, optionally colored by a third."""
 
         sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data)
+        plt.title(f"Scatterplot of {x_feature} vs {y_feature}")
         self.plot(filename)
 
     def plot_distribution(self, feature, filename=None):
         """Plot the value counts of a target variable as a bar chart."""
 
         self.data[feature].value_counts().plot(kind='bar')
+        plt.title(f"Value Counts of {target}")
         self.plot(filename)
 
-    def plot_violin(self, _class, feature, filename=None):
+    def plot_violin(self, x_feature, y_feature, filename=None):
         """Plot a violin plot for a feature relative to the target variable."""
 
-        sns.violinplot(x=_class, y=feature, data=self.data)
+        sns.violinplot(x=x_feature, y=y_feature, data=self.data)
+        plt.title(f"Violin Plot of {x_feature} by {y_feature}")
         self.plot(filename)
-
-if __name__ == "__main__":
-   dset = Data_Set("C:\\Users\\admin\\Documents\\Artificial Intelligence\\Artificial-Intelligence\\datasets\\housing\\housing.csv")

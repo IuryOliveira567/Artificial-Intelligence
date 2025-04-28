@@ -9,8 +9,7 @@ class Data_Set():
     def __init__(self, data_path):
         """Initialize the analyzer by loading data from a CSV file."""
 
-        self.data_path = "\\".join(data_path.split("\\")[:-1])
-        self.filename = data_path.split("\\")[-1]
+        self.data_path, self.filename = os.path.split(data_path)
         self.data = self.load_data()
     
     def load_data(self):

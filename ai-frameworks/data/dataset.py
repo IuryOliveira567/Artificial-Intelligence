@@ -18,7 +18,7 @@ class Data_Set():
 
         csv_path = os.path.join(self.data_path, self.filename)
         return pd.read_csv(csv_path)
-
+    
     def plot(self, filename=None):
         """Save the plot to a file if filename is provided and display it."""
         
@@ -68,10 +68,10 @@ class Data_Set():
         sns.countplot(x=target, data=self.data)
         self.plot(filename)
 
-    def plot_scatter(self, h_line, v_line, hue=None, filename=None):
+    def plot_scatter(self, x_feature, y_feature, hue=None, filename=None):
         """Plot a scatterplot between two features, optionally colored by a third."""
 
-        sns.scatterplot(x=h_line, y=v_line, hue=hue, data=self.data)
+        sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data)
         self.plot(filename)
 
     def plot_distribution(self, target, filename=None):

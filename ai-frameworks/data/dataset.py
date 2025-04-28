@@ -18,6 +18,20 @@ class Data_Set():
 
         csv_path = os.path.join(self.data_path, self.filename)
         return pd.read_csv(csv_path)
+
+    def show_null_counts(self):
+        """Display the number of missing (null) values per column."""
+
+        null_counts = self.data.isnull().sum()
+        print(null_counts[null_counts > 0])
+
+    def plot_null_heatmap(self, filename=None):
+        """Plot a heatmap showing the missing values in the dataset."""
+
+        plt.figure(figsize=(12, 8))
+        sns.heatmap(self.data.isnull(), cbar=False, cmap='viridis')
+        plt.title("Missing Values Heatmap")
+        self.plot(filename)
     
     def plot(self, filename=None):
         """Save the plot to a file if filename is provided and display it."""

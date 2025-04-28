@@ -44,7 +44,12 @@ class Data_Set():
         """Return basic descriptive statistics of the dataset."""
 
         return self.data.describe()
-        
+
+    def info(self):
+        """Print a concise summary of the dataset structure."""
+
+        return self.data.info()
+    
     def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None):
         """Plot histograms for all numeric features."""
 

@@ -19,18 +19,26 @@ class Data_Set():
         csv_path = os.path.join(self.data_path, self.filename)
         return pd.read_csv(csv_path)
 
+    def plot(self, filename=None):
+        """Save the plot to a file if filename is provided and display it."""
+        
+        if(filename):
+            plt.savefig(filename, format="png", dpi=300, bbox_inches="tight")
+            
+        plt.show()
+        
     def describe(self):
         """Return basic descriptive statistics of the dataset."""
 
         return self.data.describe()
         
-    def plot_histogram(self, bins=20, fig_size=(15, 20)):
+    def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None):
         """Plot histograms for all numeric features."""
 
         self.data.hist(bins=bins, figsize=fig_size)
-        plt.show()
+        self.plot(filename)
 
-    def plot_correlation_heatmap(self):
+    def plot_correlation_heatmap(self, filename=None):
         """Plot a heatmap showing the correlation matrix of numerical features."""
 
         numeric_df = self.data.select_dtypes(include='number')
@@ -40,41 +48,40 @@ class Data_Set():
         sns.heatmap(correlation, annot=True, cmap='coolwarm')
 
         plt.title("Correlations Heatmap")
-        
-        plt.show()
+        self.plot(filename)
 
-    def plot_boxplots(self, target, col):
+    def plot_boxplots(self, target, col, filename=None):
         """Plot a boxplot of a feature grouped by the target variable."""
 
         sns.boxplot(x=target, y=col, data=self.data)
-        plt.show()
+        self.plot(filename)
         
-    def plot_pairplot(self, target):
+    def plot_pairplot(self, target, filename=None):
         """Plot pairwise relationships between features, colored by the target."""
 
         sns.pairplot(self.data, hue=target)
-        plt.show()
+        self.plot(filename)
 
-    def plot_bar(self, target):
+    def plot_bar(self, target, filename=None):
         """Plot a bar chart showing the distribution of a categorical variable."""
 
         sns.countplot(x=target, data=self.data)
-        plt.show()
+        self.plot(filename)
 
-    def plot_scatter(self, h_line, v_line, hue=None):
+    def plot_scatter(self, h_line, v_line, hue=None, filename=None):
         """Plot a scatterplot between two features, optionally colored by a third."""
 
         sns.scatterplot(x=h_line, y=v_line, hue=hue, data=self.data)
-        plt.show()
+        self.plot(filename)
 
-    def plot_distribution(self, target):
+    def plot_distribution(self, target, filename=None):
         """Plot the value counts of a target variable as a bar chart."""
 
         self.data[target].value_counts().plot(kind='bar')
-        plt.show()
+        self.plot(filename)
 
-    def plot_violin(self, _class, feature):
+    def plot_violin(self, _class, feature, filename=None):
         """Plot a violin plot for a feature relative to the target variable."""
 
         sns.violinplot(x=_class, y=feature, data=self.data)
-        plt.show()
+        self.plot(filename)

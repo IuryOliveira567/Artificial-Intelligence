@@ -11,6 +11,7 @@ class Data_Set():
 
         self.data_path, self.filename = os.path.split(data_path)
         self.data = self.load_data()
+        self.default_file_format = "png"
     
     def load_data(self):
         """Load dataset from the specified file path."""
@@ -36,7 +37,7 @@ class Data_Set():
         """Save the plot to a file if filename is provided and display it."""
         
         if(filename):
-            plt.savefig(filename, format="png", dpi=300, bbox_inches="tight")
+            plt.savefig(filename, format=self.default_file_format, dpi=300, bbox_inches="tight")
             
         plt.show()
         

@@ -63,22 +63,22 @@ class Data_Set():
         plt.title("Correlations Heatmap")
         self.plot(filename)
 
-    def plot_boxplots(self, target, col, filename=None):
+    def plot_boxplots(self, x_feature, y_feature, filename=None):
         """Plot a boxplot of a feature grouped by the target variable."""
 
-        sns.boxplot(x=target, y=col, data=self.data)
+        sns.boxplot(x=x_feature, y=y_feature, data=self.data)
         self.plot(filename)
         
-    def plot_pairplot(self, target, filename=None):
+    def plot_pairplot(self, feature, filename=None):
         """Plot pairwise relationships between features, colored by the target."""
 
-        sns.pairplot(self.data, hue=target)
+        sns.pairplot(self.data, hue=feature)
         self.plot(filename)
 
-    def plot_bar(self, target, filename=None):
+    def plot_bar(self, feature, filename=None):
         """Plot a bar chart showing the distribution of a categorical variable."""
 
-        sns.countplot(x=target, data=self.data)
+        sns.countplot(x=feature, data=self.data)
         self.plot(filename)
 
     def plot_scatter(self, x_feature, y_feature, hue=None, filename=None):
@@ -87,10 +87,10 @@ class Data_Set():
         sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data)
         self.plot(filename)
 
-    def plot_distribution(self, target, filename=None):
+    def plot_distribution(self, feature, filename=None):
         """Plot the value counts of a target variable as a bar chart."""
 
-        self.data[target].value_counts().plot(kind='bar')
+        self.data[feature].value_counts().plot(kind='bar')
         self.plot(filename)
 
     def plot_violin(self, _class, feature, filename=None):
@@ -98,3 +98,6 @@ class Data_Set():
 
         sns.violinplot(x=_class, y=feature, data=self.data)
         self.plot(filename)
+
+if __name__ == "__main__":
+   dset = Data_Set("C:\\Users\\admin\\Documents\\Artificial Intelligence\\Artificial-Intelligence\\datasets\\housing\\housing.csv")

@@ -12,7 +12,8 @@ class Data_Set():
 
         self.data_path, self.filename = os.path.split(data_path)
         self.data = self.load_data()
-        self.train_set, self.test_set = train_test_split(self.data, test_size=prob_test, random_state=random_state)
+        self.train_set, self.test_set = train_test_split(self.data, test_size=prob_test,
+                                                         random_state=random_state)
         self.default_file_format = "png"
     
     def load_data(self):
@@ -27,11 +28,11 @@ class Data_Set():
         null_counts = self.data.isnull().sum()
         print(null_counts[null_counts > 0])
 
-    def plot_null_heatmap(self, filename=None):
+    def plot_null_heatmap(self, filename=None, **kwargs):
         """Plot a heatmap showing the missing values in the dataset."""
 
         plt.figure(figsize=(12, 8))
-        sns.heatmap(self.data.isnull(), cbar=False, cmap='viridis')
+        sns.heatmap(self.data.isnull(), **kwargs)
         plt.title("Missing Values Heatmap")
         self.plot(filename)
     
@@ -53,63 +54,63 @@ class Data_Set():
 
         return self.data.info()
     
-    def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None):
+    def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None, **kwargs):
         """Plot histograms for all numeric features."""
 
-        self.data.hist(bins=bins, figsize=fig_size)
+        self.data.hist(bins=bins, figsize=fig_size, **kwargs)
         plt.title("Feature Distributions")
         self.plot(filename)
         
-    def plot_correlation_heatmap(self, filename=None):
+    def plot_correlation_heatmap(self, filename=None, **kwargs):
         """Plot a heatmap showing the correlation matrix of numerical features."""
 
         numeric_df = self.data.select_dtypes(include='number')
         correlation = numeric_df.corr()
 
         plt.figure(figsize=(10, 8))
-        sns.heatmap(correlation, annot=True, cmap='coolwarm')
+        sns.heatmap(correlation, annot=True, cmap='coolwarm', **kwargs)
 
         plt.title("Correlations Heatmap")
         self.plot(filename)
 
-    def plot_boxplots(self, x_feature, y_feature, filename=None):
+    def plot_boxplots(self, x_feature, y_feature, filename=None, **kwargs):
         """Plot a boxplot of a feature grouped by the target variable."""
 
-        sns.boxplot(x=x_feature, y=y_feature, data=self.data)
+        sns.boxplot(x=x_feature, y=y_feature, data=self.data, **kwargs)
         plt.title(f"Boxplot of {x_feature} by {y_feature}")
         self.plot(filename)
         
-    def plot_pairplot(self, feature, filename=None):
+    def plot_pairplot(self, feature, filename=None, **kwargs):
         """Plot pairwise relationships between features, colored by the target."""
 
-        sns.pairplot(self.data, hue=feature)
+        sns.pairplot(self.data, **kwargs)
         plt.title(f"Pairplot of Features Colored by {feature}")
         self.plot(filename)
 
-    def plot_bar(self, feature, filename=None):
+    def plot_bar(self, feature, filename=None, **kwargs):
         """Plot a bar chart showing the distribution of a categorical variable."""
 
-        sns.countplot(x=feature, data=self.data)
+        sns.countplot(x=feature, data=self.data, **kwargs)
         plt.title(f"Distribution of {feature}")
         self.plot(filename)
 
-    def plot_scatter(self, x_feature, y_feature, hue=None, filename=None, alpha=None):
+    def plot_scatter(self, x_feature, y_feature, filename=None, **kwargs):
         """Plot a scatterplot between two features, optionally colored by a third."""
 
-        sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data, alpha=alpha)
+        sns.scatterplot(x=x_feature, y=y_feature, data=self.data, **kwargs)
         plt.title(f"Scatterplot of {x_feature} vs {y_feature}")
         self.plot(filename)
 
-    def plot_distribution(self, feature, filename=None):
+    def plot_distribution(self, feature, filename=None, **kwargs):
         """Plot the value counts of a target variable as a bar chart."""
 
-        self.data[feature].value_counts().plot(kind='bar')
+        self.data[feature].value_counts().plot(kind='bar', **kwargs)
         plt.title(f"Value Counts of {feature}")
         self.plot(filename)
 
-    def plot_violin(self, x_feature, y_feature, filename=None):
+    def plot_violin(self, x_feature, y_feature, filename=None, **kwargs):
         """Plot a violin plot for a feature relative to the target variable."""
 
-        sns.violinplot(x=x_feature, y=y_feature, data=self.data)
+        sns.violinplot(x=x_feature, y=y_feature, data=self.data, **kwargs)
         plt.title(f"Violin Plot of {x_feature} by {y_feature}")
         self.plot(filename)

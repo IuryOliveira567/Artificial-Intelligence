@@ -1,16 +1,18 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
 import os
 
 
 class Data_Set():
 
-    def __init__(self, data_path):
+    def __init__(self, data_path, prob_test=0.2, random_state=42):
         """Initialize the analyzer by loading data from a CSV file."""
 
         self.data_path, self.filename = os.path.split(data_path)
         self.data = self.load_data()
+        self.train_set, self.test_set = train_test_split(self.data, test_size=prob_test, random_state=random_state)
         self.default_file_format = "png"
     
     def load_data(self):

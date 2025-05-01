@@ -57,7 +57,7 @@ class Data_Set():
         self.data.hist(bins=bins, figsize=fig_size)
         plt.title("Feature Distributions")
         self.plot(filename)
-
+        
     def plot_correlation_heatmap(self, filename=None):
         """Plot a heatmap showing the correlation matrix of numerical features."""
 
@@ -91,10 +91,10 @@ class Data_Set():
         plt.title(f"Distribution of {feature}")
         self.plot(filename)
 
-    def plot_scatter(self, x_feature, y_feature, hue=None, filename=None):
+    def plot_scatter(self, x_feature, y_feature, hue=None, filename=None, alpha=None):
         """Plot a scatterplot between two features, optionally colored by a third."""
 
-        sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data)
+        sns.scatterplot(x=x_feature, y=y_feature, hue=hue, data=self.data, alpha=alpha)
         plt.title(f"Scatterplot of {x_feature} vs {y_feature}")
         self.plot(filename)
 

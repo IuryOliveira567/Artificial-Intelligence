@@ -1,21 +1,42 @@
 import pandas as pd
 import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedShuffleSplit
 import os
 
 
 class Data_Set():
 
-    def __init__(self, data_path, prob_test=0.2, random_state=42):
+    def __init__(self, data_path):
         """Initialize the analyzer by loading data from a CSV file."""
 
         self.data_path, self.filename = os.path.split(data_path)
         self.data = self.load_data()
-        self.train_set, self.test_set = train_test_split(self.data, test_size=prob_test,
-                                                         random_state=random_state)
         self.default_file_format = "png"
+
+    def split_train_test(self, prob_test=0.2, random_state=42):
+        """Splits the DataFrame into random train and test subsets."""
+
+        train_set, test_set = train_test_split(self.data, test_size=prob_test,
+                                                         random_state=random_state)
+        return train_set, test_set
     
+    def stratified_split(self, strat_col, bins, labels, test_size=0.2, random_state=42):
+        """Performs a stratified split of a DataFrame based on a continuous column."""
+
+        self.data = self.data.copy()
+        self.data["__strat_cat__"] = pd.cut(self.data[strat_col], bins=bins, labels=labels)
+
+        split = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+
+        for train_idx, test_idx in split.split(self.data, self.data["__strat_cat__"]):
+            self.strat_train_set = self.data.loc[train_idx].drop(columns=["__strat_cat__"])
+            self.strat_test_set = self.data.loc[test_idx].drop(columns=["__strat_cat__"])
+    
+        return self.strat_train_set, self.strat_test_set
+
     def load_data(self):
         """Load dataset from the specified file path."""
 

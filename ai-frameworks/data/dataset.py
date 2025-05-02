@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas.plotting import scatter_matrix
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -134,4 +135,10 @@ class Data_Set():
 
         sns.violinplot(x=x_feature, y=y_feature, data=self.data, **kwargs)
         plt.title(f"Violin Plot of {x_feature} by {y_feature}")
+        self.plot(filename)
+
+    def scatter_matrix(self, attributes, fig_size=(12, 8), filename=None, **kwargs):
+        """Generates a scatter matrix plot for the specified attributes in the dataset."""
+
+        scatter_matrix(self.data[attributes], figsize=fig_size, **kwargs)
         self.plot(filename)

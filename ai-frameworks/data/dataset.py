@@ -26,14 +26,14 @@ class Data_Set():
     def stratified_split(self, strat_col, bins, labels, test_size=0.2, random_state=42):
         """Performs a stratified split of a DataFrame based on a continuous column."""
 
-        self.data = self.data.copy()
-        self.data["__strat_cat__"] = pd.cut(self.data[strat_col], bins=bins, labels=labels)
+        data = self.data.copy()
+        data["__strat_cat__"] = pd.cut(data[strat_col], bins=bins, labels=labels)
 
         split = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
 
-        for train_idx, test_idx in split.split(self.data, self.data["__strat_cat__"]):
-            self.strat_train_set = self.data.loc[train_idx].drop(columns=["__strat_cat__"])
-            self.strat_test_set = self.data.loc[test_idx].drop(columns=["__strat_cat__"])
+        for train_idx, test_idx in split.split(data, data["__strat_cat__"]):
+            self.strat_train_set = data.loc[train_idx].drop(columns=["__strat_cat__"])
+            self.strat_test_set = data.loc[test_idx].drop(columns=["__strat_cat__"])
     
         return self.strat_train_set, self.strat_test_set
 

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 import os
 
 
@@ -47,7 +48,28 @@ class Data_Set():
     
         self.data[numeric_cols] = imputer.fit_transform(self.data[numeric_cols])
         print(f"Missing values in numeric columns filled using strategy: '{strategy}'")
-    
+
+    def encode_categoricals(self, drop='first'):
+        """Apply OneHotEncoding to categorical columns in the dataset."""
+
+        categorical_cols = self.data.select_dtypes(include=['object', 'category']).columns
+
+        if len(categorical_cols) == 0:
+           print("No categorical columns to encode.")
+           return
+
+        encoder = OneHotEncoder(drop=drop, sparse_output=False)
+        encoded_array = encoder.fit_transform(self.data[categorical_cols])
+
+        encoded_df = pd.DataFrame(
+            encoded_array, 
+            columns=encoder.get_feature_names_out(categorical_cols),
+            index=self.data.index
+        )
+
+        self.data = pd.concat([self.data.drop(columns=categorical_cols), encoded_df], axis=1)
+        print(f"Encoded columns: {list(categorical_cols)}")
+
     def load_data(self):
         """Load dataset from the specified file path."""
 

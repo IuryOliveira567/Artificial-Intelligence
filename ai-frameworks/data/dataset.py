@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.impute import SimpleImputer
 import os
 
 
@@ -38,6 +39,15 @@ class Data_Set():
     
         return self.strat_train_set, self.strat_test_set
 
+    def impute_missing_values(self, strategy='mean'):
+        """Fill missing values in numerical columns using the specified strategy."""
+        
+        numeric_cols = self.data.select_dtypes(include='number').columns
+        imputer = SimpleImputer(strategy=strategy)
+    
+        self.data[numeric_cols] = imputer.fit_transform(self.data[numeric_cols])
+        print(f"Missing values in numeric columns filled using strategy: '{strategy}'")
+    
     def load_data(self):
         """Load dataset from the specified file path."""
 

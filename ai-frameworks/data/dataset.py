@@ -30,6 +30,8 @@ class Data_Set():
         """Performs a stratified split of a DataFrame based on a continuous column."""
 
         data = self.data.copy()
+        data = data.dropna(axis=0, how='any')
+
         data["__strat_cat__"] = pd.cut(data[strat_col], bins=bins, labels=labels)
 
         split = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)

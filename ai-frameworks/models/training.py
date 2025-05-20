@@ -124,27 +124,27 @@ class Data_Training(object):
 
     def final_model(self, best_model, **model_params):
        """
-        Train and cross-validate a final model with the provided parameters.
+       Train and cross-validate a final model with the provided parameters.
 
-        Args:
-            best_model: A Scikit-learn compatible model class (not an instance).
-            **model_params: Keyword arguments for the model initialization.
+       Args:
+          best_model: A Scikit-learn compatible model class (not an instance).
+          **model_params: Keyword arguments for the model initialization.
 
-        Prints:
-            Average R² score across CV folds.
-        """
+       Prints:
+          Average R² score across CV folds.
+       """
        
-        pipeline = build_pipeline(
-            data=self.X_train,
-            model=best_model(**model_params),
-            num_imputer=self.num_imputer,
-            cat_imputer=self.cat_imputer
-        )
+       pipeline = build_pipeline(
+           data=self.X_train,
+           model=best_model(**model_params),
+           num_imputer=self.num_imputer,
+           cat_imputer=self.cat_imputer
+       )
                 
-        pipeline.fit(self.X_train, self.Y_train)
-        scores = cross_val_score(pipeline, self.X_train, self.Y_train, cv=5, scoring='r2')
+       pipeline.fit(self.X_train, self.Y_train)
+       scores = cross_val_score(pipeline, self.X_train, self.Y_train, cv=5, scoring='r2')
         
-        print("Average R² (CV):", scores.mean())
+       print("Average R² (CV):", scores.mean())
        
     def plot_result(self, Y_test, Y_pred, residuals):
         """

@@ -12,29 +12,38 @@ class Data_Training(object):
     with preprocessing for numerical and categorical features.
     """
     
-    def __init__(self, data, model, num_imputer="mean", cat_imputer="most_frequent"):
+    def __init__(self, data, target, model, num_imputer="mean", cat_imputer="most_frequent"):
         """
         Initialize the Data_Training instance.
 
         Args:
-            data: Dataset object with a method split_train_test() returning train/test splits.
-            model: Scikit-learn compatible estimator (e.g., Ridge, SVR, etc.).
-            num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
-            cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
+            - data: Dataset object with a method split_train_test() returning train/test splits.
+            - target: str, the target feature to be predicted
+            - model: Scikit-learn compatible estimator (e.g., Ridge, SVR, etc.).
+            - num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
+            - cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
         """
 
         self.data = data
         self.model = model
+        self.target = target
         self.num_imputer = num_imputer
         self.cat_imputer = cat_imputer
+
+        train_set, test_set = self.data.split_train_test()
         
-    def train_model(self, target, param_grid, cv=5, filename=None, plot=False):
+        self.X_train = train_set.drop(self.target, axis=1)
+        self.Y_train = train_set[self.target]
+
+        self.X_test = test_set.drop(self.target, axis=1)
+        self.Y_test = test_set[self.target]
+        
+    def train_model(self, param_grid, cv=5, filename=None, plot=False):
 
         """
         Train a model using a specified target feature.
     
         Parameters:
-            - target: str, the target feature to be predicted
             - param_grid (dict): A dictionary with parameters names (`str`) as keys and lists of parameter settings to try.
             - cv: Int, number of cross-validation folds
             - filename: Get the file name to save the best model, format: pkl
@@ -50,14 +59,6 @@ class Data_Training(object):
         
         scores = None
         best_params = None
-    
-        train_set, test_set = self.data.split_train_test()
-        
-        self.X_train = train_set.drop(target, axis=1)
-        self.Y_train = train_set[target]
-
-        X_test = test_set.drop(target, axis=1)
-        Y_test = test_set[target]
     
         pipeline = build_pipeline(
             data=self.X_train,
@@ -86,8 +87,8 @@ class Data_Training(object):
         if(filename):
            joblib.dump(best_model, filename)
         
-        Y_pred = best_model.predict(X_test)
-        self.evaluate(Y_test, Y_pred, plot)
+        Y_pred = best_model.predict(self.X_test)
+        self.evaluate(self.Y_test, Y_pred, plot)
 
         return {
            "best_model": best_model,
@@ -143,8 +144,8 @@ class Data_Training(object):
                 
        pipeline.fit(self.X_train, self.Y_train)
        scores = cross_val_score(pipeline, self.X_train, self.Y_train, cv=5, scoring='r2')
-        
-       print("Average R² (CV):", scores.mean())
+
+       print("Average R² (CV):", scores.mean())    
        
     def plot_result(self, Y_test, Y_pred, residuals):
         """

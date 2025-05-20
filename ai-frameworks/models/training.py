@@ -6,110 +6,147 @@ import joblib
 import matplotlib.pyplot as plt
 
 
-def train_model(data, target, model=None, param_grid=None, num_imputer="mean",
-                cat_imputer="most_frequent", cv=5, filename=None, plot=False):
+class Data_Training(object):
     """
-    Train a model using a specified target feature.
-    
-    Parameters:
-    - data: DataFrame containing the dataset (including target feature)
-    - target: str, the target feature to be predicted
-    - model: Scikit-learn estimator (optional, default: LinearRegression)
-    - param_grid: dict, hyperparameters to test with GridSearchCV
-    - num_imputer_strategy: Strategy for numeric imputers ('mean', 'median', 'most_frequent', 'constant')
-    - cat_imputer_strategy: Strategy for categorical imputers ('most_frequent', 'constant')
-    - cv: Int, number of cross-validation folds
-    - filename: Get the file name to save the best model, format: pkl
-
-    Returns:
-    - dict: A dictionary containing:
-        - 'predictions': Predictions on the test set.
-        - 'scores': RMSE scores from cross-validation or GridSearchCV.
-        - 'best_params': Best parameters found by GridSearchCV (if applicable).
+    A class for training and evaluating machine learning models using pipelines
+    with preprocessing for numerical and categorical features.
     """
-
-    scores = None
-    best_params = None
     
-    train_set, test_set = data.split_train_test()
-        
-    X_train = train_set.drop(target, axis=1)
-    Y_train = train_set[target]
+    def __init__(self, data, model, num_imputer="mean", cat_imputer="most_frequent"):
+        """
+        Initialize the Data_Training instance.
 
-    X_test = test_set.drop(target, axis=1)
-    Y_test = test_set[target]
+        Args:
+            data: Dataset object with a method split_train_test() returning train/test splits.
+            model: Scikit-learn compatible estimator (e.g., Ridge, SVR, etc.).
+            num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
+            cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
+        """
+
+        self.data = data
+        self.model = model
+        self.num_imputer = num_imputer
+        self.cat_imputer = cat_imputer
+        
+    def train_model(self, target, param_grid, cv=5, filename=None, plot=False):
+
+        """
+        Train a model using a specified target feature.
     
-    pipeline = build_pipeline(
-        data=X_train,
-        model=model,
-        num_imputer=num_imputer,
-        cat_imputer=cat_imputer
-    )
+        Parameters:
+            - target: str, the target feature to be predicted
+            - param_grid (dict): A dictionary with parameters names (`str`) as keys and lists of parameter settings to try.
+            - cv: Int, number of cross-validation folds
+            - filename: Get the file name to save the best model, format: pkl
+            - plot: plot the result graph
 
-    if(param_grid):
-        grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring="neg_mean_squared_error", cv=cv)
-        grid_search.fit(X_train, Y_train)
-
-        best_model = grid_search.best_estimator_
-        best_params = grid_search.best_params_
-        scores = np.sqrt(-grid_search.best_score_)
-        print("best parameters : ", best_params)
-        print("best score : ", scores)
-    else:
-        best_model = pipeline.fit(X_train, Y_train)
+        Returns:
+           dict: A dictionary containing:
+              - 'best_model': The best trained model (Pipeline).
+              - 'predictions': Predictions on the test set.
+              - 'best_params': Best hyperparameters found by GridSearchCV (if applicable).
+              - 'scores': RMSE from GridSearchCV or cross-validation.
+        """
         
-        cv_scores = cross_val_score(pipeline, X_train, Y_train, scoring="neg_mean_squared_error", cv=cv)
-        scores = np.sqrt(-cv_scores)
-        print("score : ", scores)
+        scores = None
+        best_params = None
     
-    if(filename):
-        joblib.dump(best_model, filename)
+        train_set, test_set = self.data.split_train_test()
         
-    Y_pred = best_model.predict(X_test)
-    evaluate(Y_test, Y_pred, plot)
+        self.X_train = train_set.drop(target, axis=1)
+        self.Y_train = train_set[target]
 
-    return {
-        "best_model": best_model,
-        "predictions": Y_pred,
-        "best_params": best_params,
-        "scores": scores,
+        X_test = test_set.drop(target, axis=1)
+        Y_test = test_set[target]
+    
+        pipeline = build_pipeline(
+            data=self.X_train,
+            model=self.model,
+            num_imputer=self.num_imputer,
+            cat_imputer=self.cat_imputer
+        )
+
+        if(param_grid):
+            grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring="neg_mean_squared_error", cv=cv)
+            grid_search.fit(self.X_train, self.Y_train)
+
+            best_model = grid_search.best_estimator_
+            best_params = grid_search.best_params_
+            scores = np.sqrt(-grid_search.best_score_)
+
+            print("best parameters : ", best_params)
+            print("best score : ", scores)
+        else:
+            self.best_model = pipeline.fit(self.X_train, self.Y_train)
+            cv_scores = cross_val_score(pipeline, self.X_train, self.Y_train, scoring="neg_mean_squared_error", cv=cv)
+
+            scores = np.sqrt(-cv_scores)
+            print("score : ", scores)
+    
+        if(filename):
+           joblib.dump(best_model, filename)
+        
+        Y_pred = best_model.predict(X_test)
+        self.evaluate(Y_test, Y_pred, plot)
+
+        return {
+           "best_model": best_model,
+           "predictions": Y_pred,
+           "best_params": best_params,
+           "scores": scores,
         }
 
-def plot_result(Y_test, Y_pred, residuals):
-    
-    #Scatter: Y_test vs Y_pred
-    plt.figure(figsize=(6, 6))
-    plt.scatter(Y_test, Y_pred, alpha=0.5)
-    plt.plot([Y_test.min(), Y_test.max()], [Y_test.min(), Y_test.max()], 'r--')
-    plt.xlabel("Real Values")
-    plt.ylabel("Predicted Values")
-    plt.title("Predicted vs Real")
-    plt.grid(True)
-    plt.show()
+    def evaluate(self, y_test, prediction, plot=False):
+        """
+        Evaluate model predictions using common regression metrics.
 
-    #Residuals
-    plt.figure(figsize=(6, 4))
-    plt.hist(residuals, bins=50)
-    plt.title("Error Distribution")
-    plt.xlabel("Error (Y_test - Y_pred)")
-    plt.ylabel("Frequency")
-    plt.grid(True)
-    plt.show()
+        Args:
+            y_test (array-like): Ground truth target values.
+            prediction (array-like): Predicted target values.
+            plot (bool, optional): Whether to plot results and residuals. Defaults to False.
+
+        Prints:
+            RMSE, MAE, and R² metrics.
+        """
+ 
+        test_rmse = mean_squared_error(y_test, prediction)
+        test_mae = mean_absolute_error(y_test, prediction)
         
-def evaluate(y_test, prediction, plot=False):
+        test_r2 = r2_score(y_test, prediction)
+        residuals = y_test - prediction
 
-    test_rmse = mean_squared_error(y_test, prediction)
-    test_mae = mean_absolute_error(y_test, prediction)
-    test_r2 = r2_score(y_test, prediction)
-    residuals = y_test - prediction
+        print("Test RMSE:", test_rmse)
+        print("Test MAE:", test_mae)
+        print("Test R²:", test_r2)
 
-    print("Test RMSE:", test_rmse)
-    print("Test MAE:", test_mae)
-    print("Test R²:", test_r2)
+        if(plot):
+            self.plot_result(y_test, prediction, residuals)
+   
+    def plot_result(self, Y_test, Y_pred, residuals):
+        """
+        Plot predicted vs actual values and the distribution of residuals.
 
-    if(plot):
-      plot_result(y_test, prediction, residuals)
-        
-    
+        Args:
+            Y_test (array-like): Actual target values.
+            Y_pred (array-like): Predicted target values.
+            residuals (array-like): Difference between actual and predicted values.
+        """
 
-    
+        #Scatter: Y_test vs Y_pred
+        plt.figure(figsize=(6, 6))
+        plt.scatter(Y_test, Y_pred, alpha=0.5)
+        plt.plot([Y_test.min(), Y_test.max()], [Y_test.min(), Y_test.max()], 'r--')
+        plt.xlabel("Real Values")
+        plt.ylabel("Predicted Values")
+        plt.title("Predicted vs Real")
+        plt.grid(True)
+        plt.show()
+
+        #Residuals
+        plt.figure(figsize=(6, 4))
+        plt.hist(residuals, bins=50)
+        plt.title("Error Distribution")
+        plt.xlabel("Error (Y_test - Y_pred)")
+        plt.ylabel("Frequency")
+        plt.grid(True)
+        plt.show()

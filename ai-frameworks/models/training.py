@@ -1,6 +1,6 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, GridSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, 
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
@@ -46,6 +46,7 @@ class Data_Training(object):
         Parameters:
             - param_grid (dict): A dictionary with parameters names (`str`) as keys and lists of parameter settings to try.
             - cv: Int, number of cross-validation folds
+            - ev_type: prediction method: regression, classification
             - filename: Get the file name to save the best model, format: pkl
             - plot: plot the result graph
 
@@ -96,9 +97,10 @@ class Data_Training(object):
         Evaluate model predictions using common regression metrics.
 
         Args:
-            y_test (array-like): Ground truth target values.
-            prediction (array-like): Predicted target values.
-            plot (bool, optional): Whether to plot results and residuals. Defaults to False.
+            - y_test (array-like): Ground truth target values.
+            - prediction (array-like): Predicted target values.
+            - evaluation_type: regression, classification
+            - plot (bool, optional): Whether to plot results and residuals. Defaults to False.
 
         Prints:
             RMSE, MAE, and R² metrics.

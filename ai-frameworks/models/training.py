@@ -1,6 +1,6 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, GridSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, 
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
@@ -38,7 +38,7 @@ class Data_Training(object):
         self.X_test = test_set.drop(self.target, axis=1)
         self.Y_test = test_set[self.target]
         
-    def train_model(self, param_grid, cv=5, filename=None, plot=False):
+    def train_model(self, param_grid, cv=5, ev_type="regression", filename=None, plot=False):
 
         """
         Train a model using a specified target feature.
@@ -73,31 +73,25 @@ class Data_Training(object):
 
             best_model = grid_search.best_estimator_
             best_params = grid_search.best_params_
-            scores = np.sqrt(-grid_search.best_score_)
 
             print("best parameters : ", best_params)
-            print("best score : ", scores)
         else:
             self.best_model = pipeline.fit(self.X_train, self.Y_train)
-            cv_scores = cross_val_score(pipeline, self.X_train, self.Y_train, scoring="neg_mean_squared_error", cv=cv)
-
-            scores = np.sqrt(-cv_scores)
-            print("score : ", scores)
     
         if(filename):
            joblib.dump(best_model, filename)
         
         Y_pred = best_model.predict(self.X_test)
-        self.evaluate(self.Y_test, Y_pred, plot)
+        self.evaluate(self.Y_test, Y_pred, ev_type, plot)
 
         return {
            "best_model": best_model,
            "predictions": Y_pred,
            "best_params": best_params,
-           "scores": scores,
+           "scores": scores
         }
 
-    def evaluate(self, y_test, prediction, plot=False):
+    def evaluate(self, y_test, prediction, evaluation_type, plot=False):
         """
         Evaluate model predictions using common regression metrics.
 
@@ -109,20 +103,32 @@ class Data_Training(object):
         Prints:
             RMSE, MAE, and R² metrics.
         """
- 
-        test_rmse = mean_squared_error(y_test, prediction)
-        test_mae = mean_absolute_error(y_test, prediction)
-        
-        test_r2 = r2_score(y_test, prediction)
-        residuals = y_test - prediction
 
-        print("Test RMSE:", test_rmse)
-        print("Test MAE:", test_mae)
-        print("Test R²:", test_r2)
+        if(evaluation_type == "regression"):
+            rmse = mean_squared_error(y_test, prediction)
+            mae = mean_absolute_error(y_test, prediction)
+            r2 = r2_score(y_test, prediction)
 
-        if(plot):
-            self.plot_result(y_test, prediction, residuals)
+            print("Test RMSE:", rmse)
+            print("Test MAE:", mae)
+            print("Test R²:", r2)
 
+            if(plot):
+                residuals = y_test - prediction
+                self.plot_result(y_test, prediction, residuals)
+        elif(evaluation_type == "classification"):
+            acc = accuracy_score(y_test, prediction)
+            prec = precision_score(y_test, prediction, average="weighted", zero_division=0)
+            rec = recall_score(y_test, prediction, average="weighted", zero_division=0)
+            f1 = f1_score(y_test, prediction, average="weighted", zero_division=0)
+            cm = confusion_matrix(y_test, prediction)
+
+            print("Accuracy:", acc)
+            print("Precision:", prec)
+            print("Recall:", rec)
+            print("F1 Score:", f1)
+            print("Confusion Matrix:\n", cm)
+            
     def final_model(self, best_model, **model_params):
        """
        Train and cross-validate a final model with the provided parameters.

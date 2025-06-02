@@ -12,11 +12,22 @@ import os
 
 class Data_Set():
 
-    def __init__(self, data_path):
-        """Initialize the analyzer by loading data from a CSV file."""
+    def __init__(self, data_path=None, data=None):
+        """
+        Initialize the analyzer by loading data from a CSV file.
 
-        self.data_path, self.filename = os.path.split(data_path)
-        self.data = self.load_data()
+        Args:
+            - data_path: Dataset csv file
+            - data: Dataset data
+ 
+        """
+
+        if(data is None):
+           self.data_path, self.filename = os.path.split(data_path)
+           self.data = self.load_data()
+        else:
+            self.data = data
+
         self.default_file_format = "png"
 
     def split_train_test(self, prob_test=0.2, random_state=42):

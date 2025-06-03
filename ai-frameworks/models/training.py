@@ -12,14 +12,15 @@ class Data_Training(object):
     with preprocessing for numerical and categorical features.
     """
     
-    def __init__(self, data, target, model, num_imputer="mean", cat_imputer="most_frequent"):
+    def __init__(self, data, model, train_test_data=None, target=None, num_imputer="mean", cat_imputer="most_frequent"):
         """
         Initialize the Data_Training instance.
 
         Args:
             - data: Dataset object with a method split_train_test() returning train/test splits.
-            - target: str, the target feature to be predicted
             - model: Scikit-learn compatible estimator (e.g., Ridge, SVR, etc.).
+            - train_test_data: tuple containing the training and test sets(e.g, (x_train, x_test, y_train, y_test)
+            - target: str, the target feature to be predicted
             - num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
             - cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
         """
@@ -30,14 +31,17 @@ class Data_Training(object):
         self.num_imputer = num_imputer
         self.cat_imputer = cat_imputer
 
-        train_set, test_set = self.data.split_train_test()
-        
-        self.X_train = train_set.drop(self.target, axis=1)
-        self.Y_train = train_set[self.target]
+        if(target):
+            train_set, test_set = self.data.split_train_test()
 
-        self.X_test = test_set.drop(self.target, axis=1)
-        self.Y_test = test_set[self.target]
-        
+            self.X_train = train_set.drop(self.target, axis=1)
+            self.Y_train = train_set[self.target]
+
+            self.X_test = test_set.drop(self.target, axis=1)
+            self.Y_test = test_set[self.target]
+        else:
+            self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_data
+            
     def train_model(self, param_grid, cv=5, ev_type="regression", filename=None, plot=False):
 
         """
@@ -121,8 +125,10 @@ class Data_Training(object):
         elif(evaluation_type == "classification"):
             acc = accuracy_score(y_test, prediction)
             prec = precision_score(y_test, prediction, average="weighted", zero_division=0)
+            
             rec = recall_score(y_test, prediction, average="weighted", zero_division=0)
             f1 = f1_score(y_test, prediction, average="weighted", zero_division=0)
+
             cm = confusion_matrix(y_test, prediction)
 
             print("Accuracy:", acc)

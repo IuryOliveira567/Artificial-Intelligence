@@ -46,7 +46,7 @@ class Data_Training(object):
         else:
             self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_data
             
-    def train_model(self, param_grid, cv=5, filename=None, plot=False):
+    def train_model(self, param_grid, cv=5, plot=False):
 
         """
         Train a model using a specified target feature.
@@ -54,7 +54,6 @@ class Data_Training(object):
         Parameters:
             - param_grid (dict): A dictionary with parameters names (`str`) as keys and lists of parameter settings to try.
             - cv: Int, number of cross-validation folds
-            - filename: Get the file name to save the best model, format: pkl
             - plot: plot the result graph
 
         Returns:
@@ -86,9 +85,6 @@ class Data_Training(object):
         else:
             self.best_model = pipeline.fit(self.X_train, self.Y_train)
     
-        if(filename):
-           joblib.dump(self.best_model, filename)
-        
         Y_pred = self.best_model.predict(self.X_test)
         self.evaluate(y_test=self.Y_test, prediction=Y_pred, model=self.best_model, plot=plot)
 
@@ -204,6 +200,21 @@ class Data_Training(object):
         else:
             print("Unknown ev_type! Must be 'regression' or 'classification'.")
 
+    def save_model(self, filename, pipeline):
+        """
+        Save a model given a filename and pipeline
+
+        Args:
+           - filename: Get the file name to save the best model, format: pkl
+        """
+        
+        if(filename.split(".")[-1] != "pkl"):
+            print("[-] File format must be pkl.")
+            return
+            
+        joblib.dump(pipeline, filename)
+        print("[+] Model saved!")
+        
     def plot_result(self, Y_test, Y_pred, residuals):
         """
         Plot predicted vs actual values and the distribution of residuals.

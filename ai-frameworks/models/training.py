@@ -1,6 +1,6 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, auc
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
@@ -200,6 +200,12 @@ class Data_Training(object):
         else:
             print("Unknown ev_type! Must be 'regression' or 'classification'.")
 
+    def plot_roc_curve(self, scores, label=None):
+
+        fpr, tpr, thresholds = roc_curve(self.Y_test, scores)    
+        plt.plot(fpr, tpr, linewidth=2, label=label)
+        plt.show()
+    
     def save_model(self, filename, pipeline):
         """
         Save a model given a filename and pipeline

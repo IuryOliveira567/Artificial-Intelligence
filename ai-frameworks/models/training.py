@@ -201,6 +201,15 @@ class Data_Training(object):
             print("Unknown ev_type! Must be 'regression' or 'classification'.")
 
     def plot_roc_curve(self, scores, label=None):
+        """
+        Plots the Receiver Operating Characteristic (ROC) curve based on test set predictions.
+
+        Args:
+           scores : array-like, an array of decision scores or probabilities returned by the classifier for the test set.
+
+        label : str, optional (default=None)
+            A label for the plot legend, typically indicating the model or configuration used.
+        """
 
         fpr, tpr, thresholds = roc_curve(self.Y_test, scores)    
         plt.plot(fpr, tpr, linewidth=2, label=label)

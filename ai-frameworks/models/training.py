@@ -224,7 +224,7 @@ class Data_Training(object):
         plt.plot(fpr, tpr, linewidth=2, label=label)
         plt.show()
 
-    def plot_confusion_matrix(self, model):
+    def plot_confusion_matrix(self, model, normalize=False):
         """
         Plots the confusion matrix for the given model using training data.
 
@@ -234,6 +234,12 @@ class Data_Training(object):
          
         y_train_pred = cross_val_predict(model, self.X_train, self.Y_train, cv=3)
         conf_mx = confusion_matrix(self.Y_train, y_train_pred)
+
+        if(normalize):
+            row_sums = conf_mx.sum(axis=1, keepdims=True)
+            conf_mx = conf_mx / row_sums
+            np.fill_diagonal(conf_mx, 0)
+            
         plt.matshow(conf_mx, cmap=plt.cm.gray)
         plt.show()
     

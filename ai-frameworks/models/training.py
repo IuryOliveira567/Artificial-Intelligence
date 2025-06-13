@@ -205,6 +205,20 @@ class Data_Training(object):
         fpr, tpr, thresholds = roc_curve(self.Y_test, scores)    
         plt.plot(fpr, tpr, linewidth=2, label=label)
         plt.show()
+
+    def plot_confusion_matrix(self, model):
+        """
+        Plots the confusion matrix for the given model using training data.
+
+        Args:
+           model : estimator object
+        """
+         
+        y_train_pred = cross_val_predict(model, self.X_train, self.Y_train, cv=3)
+        conf_mx = confusion_matrix(self.Y_train, y_train_pred)
+
+        plt.matshow(conf_mx, cmap=plt.cm.gray)
+        plt.show()
     
     def save_model(self, filename, pipeline):
         """

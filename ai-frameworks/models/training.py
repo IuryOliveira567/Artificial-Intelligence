@@ -144,7 +144,16 @@ class Data_Training(object):
                 self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
         
     def plot_precision_recall_vs_threshold(self, precisions, recalls, thresholds):
+        """
+        Plots Precision and Recall as functions of the decision threshold.
+  
+        Args:
+          precisions: array-like, precision values corresponding to different thresholds.
+          recalls: array-like, recall values corresponding to different thresholds.
+          thresholds: array-like, threshold values used to compute the corresponding precision and recall scores.
 
+        """
+        
         plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
         plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
 
@@ -225,7 +234,6 @@ class Data_Training(object):
          
         y_train_pred = cross_val_predict(model, self.X_train, self.Y_train, cv=3)
         conf_mx = confusion_matrix(self.Y_train, y_train_pred)
-
         plt.matshow(conf_mx, cmap=plt.cm.gray)
         plt.show()
     

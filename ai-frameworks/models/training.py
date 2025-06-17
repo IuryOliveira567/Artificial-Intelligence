@@ -1,6 +1,7 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, auc
+from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
@@ -12,7 +13,7 @@ class Data_Training(object):
     with preprocessing for numerical and categorical features.
     """
     
-    def __init__(self, data, model, train_test_data=None, target=None, ev_type="regression",
+    def __init__(self, data, model, train_test_data=None, target=None, ev_type="regression", encode_label=False,
                  num_imputer="mean", cat_imputer="most_frequent"):
         """
         Initialize the Data_Training instance.
@@ -43,6 +44,11 @@ class Data_Training(object):
 
             self.X_test = test_set.drop(self.target, axis=1)
             self.Y_test = test_set[self.target]
+
+            if self.ev_type == "classification" and encode_label:
+                self.label_encoder = LabelEncoder()
+                self.Y_train = self.label_encoder.fit_transform(self.Y_train)
+                self.Y_test = self.label_encoder.transform(self.Y_test)
         else:
             self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_data
             

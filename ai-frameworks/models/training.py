@@ -1,6 +1,6 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, auc
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import joblib
@@ -35,6 +35,8 @@ class Data_Training(object):
         
         self.num_imputer = num_imputer
         self.cat_imputer = cat_imputer
+
+        self.pipeline = None
         
         if(target):
             train_set, test_set = self.data.split_train_test()
@@ -184,38 +186,38 @@ class Data_Training(object):
            - For other cases: nothing
         """
 
-        pipeline = build_pipeline(
+        self.pipeline = build_pipeline(
             data=self.X_train,
             model=best_model(**model_params),
             num_imputer=self.num_imputer,
             cat_imputer=self.cat_imputer
         )
 
-        pipeline.fit(self.X_train, self.Y_train)
+        self.pipeline.fit(self.X_train, self.Y_train)
 
         if self.ev_type == "regression":
-            scores = cross_val_score(pipeline, self.X_train, self.Y_train, cv=5, scoring='r2')
+            scores = cross_val_score(self.pipeline, self.X_train, self.Y_train, cv=5, scoring='r2')
             print("Average R² (CV):", scores.mean())
             
-            y_pred_new = pipeline.predict(self.X_test)
+            y_pred_new = self.pipeline.predict(self.X_test)
             self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
         elif self.ev_type == "classification":
             if threshold is not None:
                 def predict_with_threshold(X, threshold):
-                    scores = pipeline.decision_function(X)
+                    scores = self.pipeline.decision_function(X)
                     return (scores > threshold).astype(int)
             
                 y_pred_new = predict_with_threshold(self.X_test, threshold)
                 self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
                 
-                return pipeline, predict_with_threshold
+                return self.pipeline, predict_with_threshold
             else:
-                y_pred_new = pipeline.predict(self.X_test)
+                y_pred_new = self.pipeline.predict(self.X_test)
                 self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
         else:
             print("Unknown ev_type! Must be 'regression' or 'classification'.")
 
-    def plot_roc_curve(self, scores, label=None):
+    def plot_roc_curve(self, method="decision_function", label=None):
         """
         Plots the Receiver Operating Characteristic (ROC) curve based on test set predictions.
 
@@ -226,8 +228,27 @@ class Data_Training(object):
             A label for the plot legend, typically indicating the model or configuration used.
         """
 
-        fpr, tpr, thresholds = roc_curve(self.Y_test, scores)    
-        plt.plot(fpr, tpr, linewidth=2, label=label)
+        assert self.pipeline, "pipeline is None: have trained the final model yet?"
+            
+        if(method == "decision_function"):
+            scores = self.pipeline.decision_function(self.X_test)
+        elif(method == "predict_proba"):
+            scores = self.pipeline.predict_proba(self.X_test)[:, 1]
+        else:
+            raise ValueError("Method must be either 'decision_function' or 'predict_proba'")
+
+        fpr, tpr, thresholds = roc_curve(self.Y_test, scores)
+        auc = roc_auc_score(self.Y_test, scores)
+        
+        plt.plot(fpr, tpr, linewidth=2, label=f"ROC Curve (AUC = {auc:.2f})")
+        plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier')
+            
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("ROC Curve")
+        plt.legend()
+        
+        plt.grid(True)
         plt.show()
 
     def plot_confusion_matrix(self, model, normalize=False):

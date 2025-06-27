@@ -1,7 +1,8 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.impute import SimpleImputer
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
@@ -14,7 +15,9 @@ class Data_Training(object):
     """
     
     def __init__(self, data, model, train_test_data=None, target=None, ev_type="regression", encode_label=False,
-                 num_imputer="mean", cat_imputer="most_frequent"):
+                 num_imputer=SimpleImputer, cat_imputer=SimpleImputer,
+                 num_imputer_method="mean", cat_imputer_method="most_frequent",
+                 num_scaler=StandardScaler):
         """
         Initialize the Data_Training instance.
 
@@ -35,6 +38,10 @@ class Data_Training(object):
         
         self.num_imputer = num_imputer
         self.cat_imputer = cat_imputer
+
+        self.num_imputer_method = num_imputer_method
+        self.num_scaler = num_scaler
+        self.cat_imputer_method = cat_imputer_method
 
         self.pipeline = None
         
@@ -74,12 +81,15 @@ class Data_Training(object):
         
         scores = None
         best_params = None
-    
+
         pipeline = build_pipeline(
             data=self.X_train,
             model=self.model,
             num_imputer=self.num_imputer,
-            cat_imputer=self.cat_imputer
+            num_imputer_method=self.num_imputer_method,
+            num_scaler=self.num_scaler,
+            cat_imputer=self.cat_imputer,
+            cat_imputer_method=self.cat_imputer_method
         )
 
         if(param_grid):
@@ -190,7 +200,10 @@ class Data_Training(object):
             data=self.X_train,
             model=best_model(**model_params),
             num_imputer=self.num_imputer,
-            cat_imputer=self.cat_imputer
+            num_imputer_method=self.num_imputer_method,
+            num_scaler=self.num_scaler,
+            cat_imputer=self.cat_imputer,
+            cat_imputer_method=self.cat_imputer_method
         )
 
         self.pipeline.fit(self.X_train, self.Y_train)

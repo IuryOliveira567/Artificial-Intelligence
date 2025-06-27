@@ -1,19 +1,23 @@
 from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
+import time
 from sklearn.linear_model import LogisticRegression
 
 
-def build_pipeline(data, model=None, num_imputer="mean", cat_imputer="most_frequent"):
+def build_pipeline(data, num_imputer, num_imputer_method, num_scaler,
+                   cat_imputer, cat_imputer_method, model=None):
     """
     Build a preprocessing and modeling pipeline.
     
     Parameters:
     - data: DataFrame with training data (including all features)
+    - num_imputer: Numeric imputer function (default: SimpleImputer)
+    - num_imputer_method: Numeric imputer method (default: mean)
+    - num_scaler: Numeric scaler function (default: SimpleScaler)
+    - cat_imputer: Categorical imputer method (default: SimpleImputer)
+    - cat_imputer_method: Categoric imputer method (default: most_frequent)
     - model: A scikit-learn estimator (default: LogisticRegression)
-    - num_imputer: Numeric imputer method (default: mean)
-    - cat_imputer: Categoric imputer method (default: most_frequent)
 
     Returns:
     - pipeline: a scikit-learn Pipeline object
@@ -33,15 +37,15 @@ def build_pipeline(data, model=None, num_imputer="mean", cat_imputer="most_frequ
     
     if(num_imputer):
         num_pipeline = Pipeline([
-            ("imputer", SimpleImputer(strategy=num_imputer)),
-            ("scaler", StandardScaler())
+            ("imputer", num_imputer(strategy=num_imputer_method)),
+            ("scaler", num_scaler())
         ])
         
         preprocessor.transformers.append(("num", num_pipeline, num_cols))
-
+    
     if(cat_imputer):
         cat_pipeline = Pipeline([
-            ("imputer", SimpleImputer(strategy=cat_imputer)),
+            ("imputer", cat_imputer(strategy=cat_imputer_method)),
             ("encoder", OneHotEncoder(sparse_output=False, handle_unknown="ignore"))
         ])
 
@@ -49,5 +53,5 @@ def build_pipeline(data, model=None, num_imputer="mean", cat_imputer="most_frequ
 
     if(preprocessor.transformers):
         pipeline.steps.insert(0, ("preprocessor", preprocessor))
-
+    
     return pipeline

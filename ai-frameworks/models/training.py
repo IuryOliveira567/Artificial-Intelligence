@@ -214,6 +214,8 @@ class Data_Training(object):
             
             y_pred_new = self.pipeline.predict(self.X_test)
             self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
+
+            return self.pipeline
         elif self.ev_type == "classification":
             if threshold is not None:
                 def predict_with_threshold(X, threshold):

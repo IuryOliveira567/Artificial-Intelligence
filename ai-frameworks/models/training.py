@@ -16,7 +16,7 @@ class Data_Training(object):
     
     def __init__(self, data, model, train_test_data=None, target=None, ev_type="regression", encode_label=False,
                  num_imputer=SimpleImputer, cat_imputer=SimpleImputer,
-                 num_imputer_method="mean", cat_imputer_method="most_frequent",
+                 num_imputer_args={"strategy":"most_frequent"}, cat_imputer_method="most_frequent",
                  num_scaler=StandardScaler):
         """
         Initialize the Data_Training instance.
@@ -37,10 +37,10 @@ class Data_Training(object):
         self.ev_type = ev_type
         
         self.num_imputer = num_imputer
-        self.cat_imputer = cat_imputer
-
-        self.num_imputer_method = num_imputer_method
+        self.num_imputer_args = num_imputer_args
         self.num_scaler = num_scaler
+
+        self.cat_imputer = cat_imputer
         self.cat_imputer_method = cat_imputer_method
 
         self.pipeline = None
@@ -86,7 +86,7 @@ class Data_Training(object):
             data=self.X_train,
             model=self.model,
             num_imputer=self.num_imputer,
-            num_imputer_method=self.num_imputer_method,
+            num_imputer_args=self.num_imputer_args,
             num_scaler=self.num_scaler,
             cat_imputer=self.cat_imputer,
             cat_imputer_method=self.cat_imputer_method
@@ -200,7 +200,7 @@ class Data_Training(object):
             data=self.X_train,
             model=best_model(**model_params),
             num_imputer=self.num_imputer,
-            num_imputer_method=self.num_imputer_method,
+            num_imputer_args=self.num_imputer_args,
             num_scaler=self.num_scaler,
             cat_imputer=self.cat_imputer,
             cat_imputer_method=self.cat_imputer_method

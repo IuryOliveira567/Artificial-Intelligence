@@ -5,7 +5,7 @@ import time
 from sklearn.linear_model import LogisticRegression
 
 
-def build_pipeline(data, num_imputer, num_imputer_method, num_scaler,
+def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
                    cat_imputer, cat_imputer_method, model=None):
     """
     Build a preprocessing and modeling pipeline.
@@ -37,7 +37,7 @@ def build_pipeline(data, num_imputer, num_imputer_method, num_scaler,
     
     if(num_imputer):
         num_pipeline = Pipeline([
-            ("imputer", num_imputer(strategy=num_imputer_method)),
+            ("imputer", num_imputer(**num_imputer_args)),
             ("scaler", num_scaler())
         ])
         

@@ -12,7 +12,7 @@ import os
 
 class Data_Set():
 
-    def __init__(self, data_path=None, data=None):
+    def __init__(self, data_path=None, data=None, feature_names=None):
         """
         Initialize the analyzer by loading data from a CSV file.
 
@@ -26,7 +26,7 @@ class Data_Set():
            self.data_path, self.filename = os.path.split(data_path)
            self.data = self.load_data()
         else:
-            self.data = data
+            self.data = pd.DataFrame(data, columns=feature_names)
 
         self.default_file_format = "png"
 

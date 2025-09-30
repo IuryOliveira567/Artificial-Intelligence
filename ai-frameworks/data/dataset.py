@@ -29,7 +29,7 @@ class Data_Set():
             self.data = pd.DataFrame(data, columns=feature_names)
 
         self.default_file_format = "png"
-
+    
     def split_train_test(self, prob_test=0.2, random_state=42):
         """Splits the DataFrame into random train and test subsets."""
 
@@ -53,6 +53,11 @@ class Data_Set():
     
         return self.strat_train_set, self.strat_test_set
 
+    def sample(self, data, n_samples):
+        """Return a random sample of rows from the given dataset."""
+        
+        return data.sample(n_samples, random_state=42)
+        
     def impute_missing_values(self, strategy='mean'):
         """Fill missing values in numerical columns using the specified strategy."""
         

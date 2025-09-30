@@ -126,10 +126,11 @@ class Data_Set():
 
         return self.data.info()
     
-    def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None, **kwargs):
+    def plot_histogram(self, bins=20, fig_size=(15, 20), filename=None, tight_layout=3.0, **kwargs):
         """Plot histograms for all numeric features."""
 
         self.data.hist(bins=bins, figsize=fig_size, **kwargs)
+        plt.tight_layout(pad=tight_layout)
         plt.title("Feature Distributions")
         self.plot(filename)
         

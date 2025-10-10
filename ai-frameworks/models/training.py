@@ -155,9 +155,11 @@ class Data_Training(object):
             print("Confusion Matrix:\n", cm)
 
             if(plot):
-                y_scores = cross_val_predict(model, self.X_train, self.Y_train, cv=3,
-                                             method="decision_function")
-                 
+                method = "decision_function" if hasattr(model, "decision_function") else "predict_proba"
+                               
+                y_scores = cross_val_predict(model, self.X_train, self.Y_train, cv=3, method=method)
+                y_scores = y_scores[:, 1] if(method == "predict_proba") else y_scores
+                
                 precisions, recalls, thresholds = precision_recall_curve(self.Y_train, y_scores)
                 self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
         

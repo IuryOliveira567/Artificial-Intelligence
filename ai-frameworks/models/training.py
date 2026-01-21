@@ -61,7 +61,7 @@ class Data_Training(object):
         else:
             self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_data
             
-    def train_model(self, param_grid, cv=5, plot=False):
+    def train_model(self, param_grid, cv=5, scoring="neg_mean_squared_error", plot=False):
 
         """
         Train a model using a specified target feature.
@@ -93,7 +93,7 @@ class Data_Training(object):
         )
 
         if(param_grid):
-            grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring="neg_mean_squared_error", cv=cv)
+            grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scoring, cv=cv)
             grid_search.fit(self.X_train, self.Y_train)
 
             self.best_model = grid_search.best_estimator_

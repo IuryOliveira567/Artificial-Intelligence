@@ -221,7 +221,13 @@ class Data_Training(object):
         elif self.ev_type == "classification":
             if threshold is not None:
                 def predict_with_threshold(X, threshold):
-                    scores = self.pipeline.decision_function(X)
+                    if hasattr(self.pipeline, "decision_function"):
+                        scores = self.pipeline.decision_function(X)
+                    elif hasattr(self.pipeline, "predict_proba"):
+                        scores = self.pipeline.predict_proba(X)[:, 1]
+                    else:
+                        raise ValueError("Model does not support thresholding.")
+
                     return (scores > threshold).astype(int)
             
                 y_pred_new = predict_with_threshold(self.X_test, threshold)

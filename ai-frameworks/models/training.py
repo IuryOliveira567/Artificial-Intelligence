@@ -230,7 +230,7 @@ class Data_Training(object):
                 return self.pipeline, predict_with_threshold
             else:
                 y_pred_new = self.pipeline.predict(self.X_test)
-                self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
+                self.evaluate(self.Y_test, y_pred_new, model=self.pipeline, plot=False)
         else:
             print("Unknown ev_type! Must be 'regression' or 'classification'.")
 

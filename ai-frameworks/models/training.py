@@ -231,7 +231,7 @@ class Data_Training(object):
                     return (scores > threshold).astype(int)
             
                 y_pred_new = predict_with_threshold(self.X_test, threshold)
-                self.evaluate(self.Y_test, y_pred_new, model=best_model(**model_params), plot=False)
+                self.evaluate(self.Y_test, y_pred_new, model=self.pipeline, plot=False)
                 
                 return self.pipeline, predict_with_threshold
             else:

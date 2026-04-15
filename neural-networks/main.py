@@ -11,3 +11,5 @@ sk_model = train_sklearn(X_train, y_train)
 dl_model = train_keras(X_train, y_train)
 
 evaluate_models(sk_model, dl_model, X_test, y_test)
+dl_model.save("models/mnist_classifier.keras")
+print("Model saved")

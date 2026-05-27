@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from preprocessing import load_and_preprocess
 from sklearn.metrics import classification_report
+from evaluate import plot_history
 
 
 X_train, X_test, y_train, y_test, scaler = load_and_preprocess("../data/sensor_data.csv")
@@ -34,3 +35,5 @@ predicted_classes = predictions.argmax(axis=1)
 
 print("\nReport:\n")
 print(classification_report(y_test, predicted_classes))
+
+plot_history(history)

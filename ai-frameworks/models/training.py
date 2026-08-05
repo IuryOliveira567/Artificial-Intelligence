@@ -1,7 +1,7 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, label_binarize
 from sklearn.impute import SimpleImputer
 import numpy as np
 import joblib
@@ -140,6 +140,7 @@ class Data_Training(object):
                 residuals = y_test - prediction
                 self.plot_result(y_test, prediction, residuals)
         elif(self.ev_type == "classification"):
+            
             acc = accuracy_score(y_test, prediction)
             prec = precision_score(y_test, prediction, average="weighted", zero_division=0)
             
@@ -158,10 +159,26 @@ class Data_Training(object):
                 method = "decision_function" if hasattr(model, "decision_function") else "predict_proba"
                                
                 y_scores = cross_val_predict(model, self.X_train, self.Y_train, cv=3, method=method)
-                y_scores = y_scores[:, 1] if(method == "predict_proba") else y_scores
-                
-                precisions, recalls, thresholds = precision_recall_curve(self.Y_train, y_scores)
-                self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
+                classes = np.unique(self.Y_train)
+
+                if len(classes) == 2:
+                    if method == "predict_proba":
+                        y_scores = y_scores[:, 1]
+
+                    precisions, recalls, thresholds = precision_recall_curve(self.Y_train, y_scores)
+                    
+                    self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
+                else:
+                    y_bin = label_binarize(self.Y_train, classes=classes)
+
+                    for i, cls in enumerate(classes):
+                        precisions, recalls, thresholds = precision_recall_curve(y_bin[:, i], y_scores[:, i])
+
+                        self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
+            
+                #y_scores = y_scores[:, 1] if(method == "predict_proba") else y_scores
+                #precisions, recalls, thresholds = precision_recall_curve(self.Y_train, y_scores)
+                #self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
         
     def plot_precision_recall_vs_threshold(self, precisions, recalls, thresholds):
         """

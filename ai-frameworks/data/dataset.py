@@ -12,19 +12,20 @@ import os
 
 class Data_Set():
 
-    def __init__(self, data_path=None, data=None, feature_names=None):
+    def __init__(self, data_path=None, data=None, feature_names=None, sep=None):
         """
         Initialize the analyzer by loading data from a CSV file.
 
         Args:
             - data_path: Dataset csv file
+            - sep: csv separation char
             - data: Dataset data
  
         """
 
         if(data is None):
            self.data_path, self.filename = os.path.split(data_path)
-           self.data = self.load_data()
+           self.data = self.load_data(sep)
         else:
             self.data = pd.DataFrame(data, columns=feature_names)
 
@@ -88,11 +89,11 @@ class Data_Set():
         self.data = pd.concat([self.data.drop(columns=categorical_cols), encoded_df], axis=1)
         print(f"Encoded columns: {list(categorical_cols)}")
 
-    def load_data(self):
+    def load_data(self, sep):
         """Load dataset from the specified file path."""
 
         csv_path = os.path.join(self.data_path, self.filename)
-        return pd.read_csv(csv_path)
+        return pd.read_csv(csv_path, sep=sep)
 
     def show_null_counts(self):
         """Display the number of missing (null) values per column."""

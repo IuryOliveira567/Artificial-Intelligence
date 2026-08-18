@@ -38,8 +38,10 @@ def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
     if(num_imputer):
         num_pipeline = Pipeline([
             ("imputer", num_imputer(**num_imputer_args)),
-            ("scaler", num_scaler())
         ])
+
+        if(num_scaler):
+            num_pipeline.steps.append(("scaler", num_scaler()))
         
         preprocessor.transformers.append(("num", num_pipeline, num_cols))
     

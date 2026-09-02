@@ -1,5 +1,5 @@
 from preprocessing import build_pipeline
-from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV
+from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, label_binarize
 from sklearn.impute import SimpleImputer
@@ -17,7 +17,7 @@ class Data_Training(object):
     def __init__(self, data, model=None, train_test_data=None, target=None, ev_type="regression", encode_label=False,
                  num_imputer=SimpleImputer, cat_imputer=SimpleImputer,
                  num_imputer_args={"strategy":"most_frequent"}, cat_imputer_method="most_frequent",
-                 num_scaler=StandardScaler):
+                 num_scaler=StandardScaler, search_method="grid"):
         """
         Initialize the Data_Training instance.
 
@@ -29,6 +29,7 @@ class Data_Training(object):
             - ev_type: problem type (regression, classification)
             - num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
             - cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
+            - search_mothod: Cross validation method (grid: GridSearchCV, random: RandomizedSearchCV)
         """
 
         self.data = data
@@ -43,6 +44,7 @@ class Data_Training(object):
         self.cat_imputer = cat_imputer
         self.cat_imputer_method = cat_imputer_method
 
+        self.search_method = search_method
         self.pipeline = None
         
         if(target):
@@ -93,11 +95,17 @@ class Data_Training(object):
         )
 
         if(param_grid):
-            grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scoring, cv=cv)
-            grid_search.fit(self.X_train, self.Y_train)
+            if(self.search_method == "grid"):
+                search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scoring, cv=cv, n_jobs=-1)
+            elif(self.search_method == "random"):
+                search = RandomizedSearchCV(estimator=pipeline, param_distributions=param_grid, scoring=scoring, cv=cv, n_iter=100, random_state=42, n_jobs=-1)
+            else:
+                raise ValueError("[-] Invalid search method, use grid or random")
 
-            self.best_model = grid_search.best_estimator_
-            best_params = grid_search.best_params_
+            search.fit(self.X_train, self.Y_train)
+
+            self.best_model = search.best_estimator_
+            best_params = search.best_params_
               
             print("best parameters : ", best_params)
         else:

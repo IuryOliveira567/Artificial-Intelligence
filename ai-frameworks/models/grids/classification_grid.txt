@@ -1,0 +1,240 @@
+param_grid_classification = [
+    {
+        "model": [
+            LogisticRegression(
+                random_state=42,
+                max_iter=2000
+            )
+        ],
+        "model__C": [0.001, 0.01, 0.1, 1, 10, 100],
+        "model__penalty": ["l1", "l2"],
+        "model__solver": ["liblinear", "saga"],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [RidgeClassifier()],
+        "model__alpha": [0.01, 0.1, 1, 10, 100],
+        "model__solver": ["auto", "svd", "lsqr", "sag"],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [SGDClassifier(random_state=42)],
+        "model__loss": [
+            "hinge",
+            "log_loss",
+            "modified_huber",
+            "squared_hinge"
+        ],
+        "model__penalty": ["l2", "l1", "elasticnet"],
+        "model__alpha": [1e-5, 1e-4, 1e-3, 1e-2],
+        "model__learning_rate": [
+            "optimal",
+            "constant",
+            "adaptive"
+        ],
+        "model__eta0": [0.001, 0.01, 0.1],
+        "model__class_weight": [None, "balanced"],
+        "model__max_iter": [1000, 3000]
+    },
+    {
+        "model": [SVC(random_state=42)],
+        "model__C": [0.1, 1, 10, 100],
+        "model__kernel": ["linear", "rbf", "poly", "sigmoid"],
+        "model__gamma": ["scale", "auto"],
+        "model__degree": [2, 3, 4],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [LinearSVC(random_state=42, max_iter=5000)],
+        "model__C": [0.001, 0.01, 0.1, 1, 10, 100],
+        "model__loss": ["hinge", "squared_hinge"],
+        "model__penalty": ["l2"],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [KNeighborsClassifier()],
+        "model__n_neighbors": [3, 5, 10, 15, 20, 30],
+        "model__weights": ["uniform", "distance"],
+        "model__algorithm": ["auto", "ball_tree", "kd_tree", "brute"],
+        "model__p": [1, 2]
+    },
+    {
+        "model": [RadiusNeighborsClassifier(outlier_label="most_frequent")],
+        "model__radius": [0.5, 1, 2, 5, 10],
+        "model__weights": ["uniform", "distance"],
+        "model__p": [1, 2]
+    },
+    {
+        "model": [DecisionTreeClassifier(random_state=42)],
+        "model__criterion": [
+            "gini",
+            "entropy",
+            "log_loss"
+        ],
+        "model__splitter": ["best", "random"],
+        "model__max_depth": [None, 3, 5, 10, 20, 30],
+        "model__min_samples_split": [2, 5, 10, 20],
+        "model__min_samples_leaf": [1, 2, 5, 10],
+        "model__max_features": [None, "sqrt", "log2"],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [
+            RandomForestClassifier(
+                random_state=42,
+                n_jobs=-1
+            )
+        ],
+        "model__n_estimators": [100, 200, 300, 500],
+        "model__criterion": [
+            "gini",
+            "entropy",
+            "log_loss"
+        ],
+        "model__max_depth": [None, 10, 20, 30],
+        "model__min_samples_split": [2, 5, 10],
+        "model__min_samples_leaf": [1, 2, 5],
+        "model__max_features": [1.0, "sqrt", "log2"],
+        "model__bootstrap": [True, False],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [
+            ExtraTreesClassifier(
+                random_state=42,
+                n_jobs=-1
+            )
+        ],
+        "model__n_estimators": [100, 200, 300, 500],
+        "model__criterion": [
+            "gini",
+            "entropy",
+            "log_loss"
+        ],
+        "model__max_depth": [None, 10, 20, 30],
+        "model__min_samples_split": [2, 5, 10],
+        "model__min_samples_leaf": [1, 2, 5],
+        "model__max_features": [1.0, "sqrt", "log2"],
+        "model__bootstrap": [False, True],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [GradientBoostingClassifier(random_state=42)],
+        "model__n_estimators": [50, 100, 200, 300, 500],
+        "model__learning_rate": [0.01, 0.03, 0.05, 0.1],
+        "model__max_depth": [2, 3, 5, 7],
+        "model__min_samples_split": [2, 5, 10],
+        "model__min_samples_leaf": [1, 2, 5],
+        "model__subsample": [0.7, 0.8, 0.9, 1.0],
+        "model__max_features": [None, "sqrt", "log2"]
+    },
+    {
+        "model": [HistGradientBoostingClassifier(random_state=42)],
+        "model__max_iter": [100, 200, 300, 500],
+        "model__learning_rate": [0.01, 0.03, 0.05, 0.1],
+        "model__max_leaf_nodes": [15, 31, 63, 127],
+        "model__max_depth": [None, 5, 10, 15],
+        "model__min_samples_leaf": [10, 20, 30, 50],
+        "model__l2_regularization": [0.0, 0.1, 1.0, 10.0]
+    },
+    {
+        "model": [AdaBoostClassifier(random_state=42)],
+        "model__n_estimators": [50, 100, 200, 300],
+        "model__learning_rate": [0.01, 0.05, 0.1, 0.5, 1.0]
+    },
+    {
+        "model": [BaggingClassifier(random_state=42, n_jobs=-1)],
+        "model__n_estimators": [50, 100, 200],
+        "model__max_samples": [0.5, 0.7, 1.0],
+        "model__max_features": [0.5, 0.7, 1.0],
+        "model__bootstrap": [True, False],
+        "model__bootstrap_features": [False, True]
+    },
+    {
+        "model": [LinearDiscriminantAnalysis()],
+        "model__solver": ["svd", "lsqr", "eigen"],
+        "model__shrinkage": [
+            None,
+            "auto",
+            0.1,
+            0.5,
+            0.9
+        ]
+    },
+    {
+        "model": [QuadraticDiscriminantAnalysis()],
+        "model__reg_param": [0.0, 0.01, 0.1, 0.5, 0.9]
+    },
+    {
+        "model": [GaussianNB()],
+        "model__var_smoothing": [
+            1e-11,
+            1e-10,
+            1e-9,
+            1e-8,
+            1e-7
+        ]
+    },
+    {
+        "model": [BernoulliNB()],
+        "model__alpha": [0.01, 0.1, 1.0, 10.0],
+        "model__fit_prior": [True, False]
+    },
+    {
+        "model": [MultinomialNB()],
+        "model__alpha": [0.01, 0.1, 1.0, 10.0],
+        "model__fit_prior": [True, False]
+    },
+    {
+        "model": [
+            XGBClassifier(
+                random_state=42,
+                n_jobs=-1,
+                eval_metric="logloss"
+            )
+        ],
+        "model__n_estimators": [100, 200, 300, 500, 800],
+        "model__learning_rate": [0.01, 0.03, 0.05, 0.1],
+        "model__max_depth": [3, 5, 7, 10],
+        "model__min_child_weight": [1, 3, 5, 10],
+        "model__subsample": [0.7, 0.8, 0.9, 1.0],
+        "model__colsample_bytree": [0.7, 0.8, 0.9, 1.0],
+        "model__gamma": [0, 0.1, 0.3, 1.0],
+        "model__reg_alpha": [0, 0.01, 0.1, 1.0],
+        "model__reg_lambda": [0.1, 1.0, 5.0, 10.0]
+    },
+    {
+        "model": [
+            LGBMClassifier(
+                random_state=42,
+                n_jobs=-1,
+                verbosity=-1
+            )
+        ],
+        "model__n_estimators": [100, 200, 300, 500, 800],
+        "model__learning_rate": [0.01, 0.03, 0.05, 0.1],
+        "model__num_leaves": [15, 31, 63, 127],
+        "model__max_depth": [-1, 5, 10, 15],
+        "model__min_child_samples": [10, 20, 30, 50],
+        "model__subsample": [0.7, 0.8, 0.9, 1.0],
+        "model__colsample_bytree": [0.7, 0.8, 0.9, 1.0],
+        "model__reg_alpha": [0, 0.01, 0.1, 1.0],
+        "model__reg_lambda": [0, 0.1, 1.0, 5.0],
+        "model__class_weight": [None, "balanced"]
+    },
+    {
+        "model": [MLPClassifier(random_state=42)],
+        "model__hidden_layer_sizes": [
+            (50,),
+            (100,),
+            (100, 50),
+            (100, 50, 25)
+        ],
+        "model__activation": ["relu", "tanh"],
+        "model__solver": ["adam"],
+        "model__alpha": [0.0001, 0.001, 0.01],
+        "model__learning_rate_init": [0.0001, 0.001, 0.01],
+        "model__batch_size": ["auto", 32, 64],
+        "model__max_iter": [500, 1000]
+    }
+]

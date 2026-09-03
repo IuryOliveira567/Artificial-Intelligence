@@ -63,7 +63,7 @@ class Data_Training(object):
         else:
             self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_data
             
-    def train_model(self, param_grid, cv=5, scoring="neg_mean_squared_error", plot=False):
+    def train_model(self, param_grid, cv=3, scoring="neg_mean_squared_error", plot=False):
 
         """
         Train a model using a specified target feature.
@@ -106,7 +106,7 @@ class Data_Training(object):
 
             self.best_model = search.best_estimator_
             best_params = search.best_params_
-              
+            scores = search.cv_results_ 
             print("best parameters : ", best_params)
         else:
             self.best_model = pipeline.fit(self.X_train, self.Y_train)

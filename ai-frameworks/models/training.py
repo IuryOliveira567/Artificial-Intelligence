@@ -107,7 +107,9 @@ class Data_Training(object):
             self.best_model = search.best_estimator_
             best_params = search.best_params_
             scores = search.cv_results_ 
-            print("best parameters : ", best_params)
+
+            print("Best parameters : ", best_params)
+            print("Best CV score: ", search.best_score_)
         else:
             self.best_model = pipeline.fit(self.X_train, self.Y_train)
     
@@ -118,7 +120,8 @@ class Data_Training(object):
            "best_model": self.best_model,
            "predictions": Y_pred,
            "best_params": best_params,
-           "scores": scores
+           "scores": scores,
+           "search": search
         }
 
     def evaluate(self, y_test, prediction, model=None, plot=False):

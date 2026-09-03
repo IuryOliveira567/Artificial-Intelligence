@@ -187,10 +187,6 @@ class Data_Training(object):
 
                         self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
             
-                #y_scores = y_scores[:, 1] if(method == "predict_proba") else y_scores
-                #precisions, recalls, thresholds = precision_recall_curve(self.Y_train, y_scores)
-                #self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
-        
     def plot_precision_recall_vs_threshold(self, precisions, recalls, thresholds):
         """
         Plots Precision and Recall as functions of the decision threshold.

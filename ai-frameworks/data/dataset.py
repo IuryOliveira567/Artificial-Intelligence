@@ -31,11 +31,11 @@ class Data_Set():
 
         self.default_file_format = "png"
     
-    def split_train_test(self, prob_test=0.2, random_state=42):
+    def split_train_test(self, prob_test=0.2, random_state=42, stratify=None):
         """Splits the DataFrame into random train and test subsets."""
 
         train_set, test_set = train_test_split(self.data, test_size=prob_test,
-                                                         random_state=random_state)
+                                                         random_state=random_state, stratify=stratify)
         return train_set, test_set
     
     def stratified_split(self, strat_col, bins, labels, test_size=0.2, random_state=42):

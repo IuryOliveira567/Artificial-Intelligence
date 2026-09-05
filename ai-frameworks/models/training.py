@@ -17,7 +17,7 @@ class Data_Training(object):
     def __init__(self, data, model=None, train_test_data=None, target=None, ev_type="regression", encode_label=False,
                  num_imputer=SimpleImputer, cat_imputer=SimpleImputer,
                  num_imputer_args={"strategy":"most_frequent"}, cat_imputer_method="most_frequent",
-                 num_scaler=StandardScaler, search_method="grid"):
+                 num_scaler=StandardScaler, search_method="grid", stratify=None):
         """
         Initialize the Data_Training instance.
 
@@ -48,7 +48,7 @@ class Data_Training(object):
         self.pipeline = None
         
         if(target):
-            train_set, test_set = self.data.split_train_test()
+            train_set, test_set = self.data.split_train_test(stratify=stratify)
 
             self.X_train = train_set.drop(self.target, axis=1)
             self.Y_train = train_set[self.target]

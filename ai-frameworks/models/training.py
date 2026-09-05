@@ -1,6 +1,6 @@
 from preprocessing import build_pipeline
 from sklearn.model_selection import cross_val_score, cross_val_predict, GridSearchCV, RandomizedSearchCV
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, precision_recall_curve, roc_curve, roc_auc_score, classification_report
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, label_binarize
 from sklearn.impute import SimpleImputer
 import numpy as np
@@ -159,12 +159,14 @@ class Data_Training(object):
             f1 = f1_score(y_test, prediction, average="weighted", zero_division=0)
 
             cm = confusion_matrix(y_test, prediction)
-
+            cr = classification_report(y_test, prediction)
+                
             print("Accuracy:", acc)
             print("Precision:", prec)
             print("Recall:", rec)
             print("F1 Score:", f1)
             print("Confusion Matrix:\n", cm)
+            print("Classification report : \n", cr)
 
             if(plot):
                 method = "decision_function" if hasattr(model, "decision_function") else "predict_proba"

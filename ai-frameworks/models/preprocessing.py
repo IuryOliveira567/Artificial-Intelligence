@@ -3,10 +3,11 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 import time
 from sklearn.linear_model import LogisticRegression
+from sklearn.decomposition import PCA
 
 
 def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
-                   cat_imputer, cat_imputer_method, model=None):
+                   cat_imputer, cat_imputer_method, model=None, pca=None):
     """
     Build a preprocessing and modeling pipeline.
     
@@ -26,10 +27,7 @@ def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
     if model is None:
         model = LogisticRegression()
 
-    pipeline = Pipeline([
-        ("model", model)
-    ])
-    
+    pipeline = Pipeline([])
     preprocessor = ColumnTransformer([])
 
     num_cols = data.select_dtypes(include=['int64', 'float64']).columns.tolist()
@@ -42,7 +40,7 @@ def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
 
         if(num_scaler):
             num_pipeline.steps.append(("scaler", num_scaler()))
-        
+                                
         preprocessor.transformers.append(("num", num_pipeline, num_cols))
     
     if(cat_imputer):
@@ -50,10 +48,15 @@ def build_pipeline(data, num_imputer, num_imputer_args, num_scaler,
             ("imputer", cat_imputer(strategy=cat_imputer_method)),
             ("encoder", OneHotEncoder(sparse_output=False, handle_unknown="ignore"))
         ])
-
+      
         preprocessor.transformers.append(("cat", cat_pipeline, cat_cols))
 
     if(preprocessor.transformers):
         pipeline.steps.insert(0, ("preprocessor", preprocessor))
-    
+
+    if(pca is not None):
+        pipeline.steps.append(("pca", PCA(n_components=pca)))
+
+    pipeline.steps.append(("model", model))
+
     return pipeline

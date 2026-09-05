@@ -17,7 +17,7 @@ class Data_Training(object):
     def __init__(self, data, model=None, train_test_data=None, target=None, ev_type="regression", encode_label=False,
                  num_imputer=SimpleImputer, cat_imputer=SimpleImputer,
                  num_imputer_args={"strategy":"most_frequent"}, cat_imputer_method="most_frequent",
-                 num_scaler=StandardScaler, search_method="grid", stratify=False):
+                 num_scaler=StandardScaler, search_method="grid", stratify=False, pca=None):
         """
         Initialize the Data_Training instance.
 
@@ -30,12 +30,15 @@ class Data_Training(object):
             - num_imputer: Strategy for imputing numerical data ('mean', 'median', etc.).
             - cat_imputer: Strategy for imputing categorical data ('most_frequent', etc.).
             - search_mothod: Cross validation method (grid: GridSearchCV, random: RandomizedSearchCV)
+            - strafity: Stratification option
+            - pca: Principal component analysis(pca) value(ex.: 0.95)
         """
 
         self.data = data
         self.model = model
         self.target = target
         self.ev_type = ev_type
+        self.pca = pca
         
         self.num_imputer = num_imputer
         self.num_imputer_args = num_imputer_args
@@ -96,7 +99,8 @@ class Data_Training(object):
             num_imputer_args=self.num_imputer_args,
             num_scaler=self.num_scaler,
             cat_imputer=self.cat_imputer,
-            cat_imputer_method=self.cat_imputer_method
+            cat_imputer_method=self.cat_imputer_method,
+            pca=self.pca
         )
 
         if(param_grid):
